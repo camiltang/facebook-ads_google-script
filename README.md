@@ -1,4 +1,4 @@
-# facebook ads insight on google app script
+# Facebook Ads Insight on Google App Script
 
 This script request data from Facebook Inisght API v5.0 asyncronus and imports in a Google Sheet. 
 
