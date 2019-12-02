@@ -33,7 +33,7 @@ var FIELDS = 'account_name,account_id,campaign_name,campaign_id,objective,spend,
 
 // Set header here, as they usually appear on report. Matching all columns your FIELDS generate
 // Careful of currency in Amount Spent.
-var header = ['Account ID', 'Account Name', 'Campaign Name', 'Campaign ID', 'Objective', 'Reporting Starts', 'Reporting Ends', 'Amount Spent (USD)', 'Impressions', 'Video Watches at 25%', 'Video Watches at 50%', 'Video Watches at 75%', 'Video Watches at 95%', 'Video Watches at 100%', 'ThruPlays',  '3-Second Video Views', 'Post Reactions', 'Post Comments', 'Post Shares', 'Page Likes', 'Link Clicks', 'Page Engagement', 'Post Engagement', 'Landing Page Views', 'Post Saves', 'Searches', 'Content Views', 'Purchases','Purchases Conversion Value', 'Adds to Cart', 'Adds to Cart Conversion Value']
+var header = ['Account ID', 'Account Name', 'Campaign Name', 'Campaign ID', 'Objective', 'Reporting Starts', 'Reporting Ends', 'Amount Spent (USD)', 'Impressions', 'Video Plays at 25%', 'Video Plays at 50%', 'Video Plays at 75%', 'Video Plays at 95%', 'Video Plays at 100%', 'ThruPlays',  '3-Second Video Views', 'Post Reactions', 'Post Comments', 'Post Shares', 'Page Likes', 'Link Clicks', 'Page Engagement', 'Post Engagement', 'Landing Page Views', 'Post Saves', 'Searches', 'Content Views', 'Purchases','Purchases Conversion Value', 'Adds to Cart', 'Adds to Cart Conversion Value']
 
 // set to 1 for daily, value between 1 to 90
 var TIME_INCREMENT = '1' 
