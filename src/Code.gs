@@ -13,26 +13,15 @@ function onOpen(e) {
     .addSeparator()
     .addItem('Re-run Last Meta Report', 'rerunLastMetaReport')
     .addItem('Re-run Last TikTok Report', 'rerunLastTikTokReport')
+    .addItem('Re-run Last Snapchat Report', 'rerunLastSnapReport')
+    .addItem('Re-run Last Reddit Report', 'rerunLastRedditReport')
+    .addItem('Re-run Last Pinterest Report', 'rerunLastPinterestReport')
     .addToUi();
 }
 
-/**
- * Runs when the add-on is installed.
- */
-function onInstall(e) {
-  onOpen(e);
-}
+function onInstall(e) { onOpen(e); }
+function onHomepage(e) { showSidebar(); }
 
-/**
- * Add-on homepage trigger (for card-based add-ons).
- */
-function onHomepage(e) {
-  showSidebar();
-}
-
-/**
- * Opens the main sidebar UI.
- */
 function showSidebar() {
   var html = HtmlService.createHtmlOutputFromFile('ui/Sidebar')
     .setTitle('Social Ads Reporter')
@@ -40,37 +29,36 @@ function showSidebar() {
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
-/**
- * Re-runs the last Meta report.
- */
+// ── Re-run shortcuts ────────────────────────────────────────────────────────
+
 function rerunLastMetaReport() {
-  var props = PropertiesService.getUserProperties();
-  var lastConfig = props.getProperty('LAST_REPORT_CONFIG');
-  if (!lastConfig) {
-    SpreadsheetApp.getUi().alert('No previous Meta report found. Use the sidebar to configure one.');
-    return;
-  }
-  var result = JSON.parse(runReport(JSON.parse(lastConfig)));
-  SpreadsheetApp.getUi().alert(result.message);
+  rerunReport_('LAST_REPORT_CONFIG', 'Meta', runReport);
 }
-
-/**
- * Re-runs the last TikTok report.
- */
 function rerunLastTikTokReport() {
-  var props = PropertiesService.getUserProperties();
-  var lastConfig = props.getProperty('LAST_TIKTOK_REPORT_CONFIG');
+  rerunReport_('LAST_TIKTOK_REPORT_CONFIG', 'TikTok', runTikTokReport);
+}
+function rerunLastSnapReport() {
+  rerunReport_('LAST_SNAP_REPORT_CONFIG', 'Snapchat', runSnapchatReport);
+}
+function rerunLastRedditReport() {
+  rerunReport_('LAST_REDDIT_REPORT_CONFIG', 'Reddit', runRedditReport);
+}
+function rerunLastPinterestReport() {
+  rerunReport_('LAST_PINTEREST_REPORT_CONFIG', 'Pinterest', runPinterestReport);
+}
+
+function rerunReport_(propKey, platformName, reportFn) {
+  var lastConfig = PropertiesService.getUserProperties().getProperty(propKey);
   if (!lastConfig) {
-    SpreadsheetApp.getUi().alert('No previous TikTok report found. Use the sidebar to configure one.');
+    SpreadsheetApp.getUi().alert('No previous ' + platformName + ' report found. Use the sidebar to configure one.');
     return;
   }
-  var result = JSON.parse(runTikTokReport(JSON.parse(lastConfig)));
+  var result = JSON.parse(reportFn(JSON.parse(lastConfig)));
   SpreadsheetApp.getUi().alert(result.message);
 }
 
-/**
- * Called from the sidebar to run a Meta report and store config for re-runs.
- */
+// ── Sidebar entry points ────────────────────────────────────────────────────
+
 function runReportFromSidebar(uiConfigJson) {
   var uiConfig = JSON.parse(uiConfigJson);
   PropertiesService.getUserProperties().setProperty('LAST_REPORT_CONFIG', uiConfigJson);

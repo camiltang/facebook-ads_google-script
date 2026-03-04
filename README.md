@@ -3,40 +3,55 @@
 A Google Sheets Add-On that pulls advertising data from social media platforms directly into your spreadsheet. Configure reports through a sidebar UI, run them on demand, or schedule recurring imports.
 
 **Supported platforms:**
-- **Meta Ads** (Facebook/Instagram) — via Marketing API v21.0
-- **TikTok Ads** — via Business API v1.3
-- Snapchat, Reddit, Pinterest — coming soon
+- **Meta Ads** (Facebook/Instagram) — Marketing API v21.0
+- **TikTok Ads** — Business API v1.3
+- **Snapchat Ads** — Marketing API v1
+- **Reddit Ads** — Ads API v3
+- **Pinterest Ads** — API v5
 
 ## Features
 
 - **Sidebar UI** with step-by-step flow: authenticate, pick account, configure report, run
-- **50+ Meta metrics** and **40+ TikTok metrics** organized by category (delivery, cost, clicks, video, engagement, conversions)
+- **200+ metrics** across 5 platforms, organized by category (delivery, cost, clicks, video, engagement, conversions)
 - **Metric presets** — Essential, Performance, or All with one click
-- **Breakdowns/dimensions** — age, gender, country, device, platform, creative assets
-- **Custom date ranges** or presets (last 7d, last 30d, this month, etc.)
-- **Formatted output** — new sheet per report with header styling, banding, filters, auto-resize
+- **Breakdowns/dimensions** — age, gender, country, device, platform, creative assets (varies by platform)
+- **Custom date ranges** or presets (Meta supports last 7d, last 30d, etc.)
+- **Formatted output** — new sheet per report with platform-colored headers, banding, filters, auto-resize
 - **Scheduled reports** — daily, weekly, or monthly with two-step async (request + import 1h later)
-- **Multi-platform tabs** — switch between Meta and TikTok from the same sidebar
+- **5-platform tab navigation** — switch between platforms from the same sidebar
 
 ## Project Structure
 
 ```
-├── appsscript.json              # Add-on manifest, OAuth scopes, library deps
+├── appsscript.json                # Add-on manifest, OAuth scopes, library deps
 ├── src/
-│   ├── Code.gs                  # Entry point, menu, sidebar launcher
-│   ├── Config.gs                # Meta API constants, metrics/breakdowns catalog
-│   ├── Auth.gs                  # Meta OAuth2 (via apps-script-oauth2 library)
-│   ├── MetaApi.gs               # Meta Marketing API calls (accounts, insights)
-│   ├── ReportBuilder.gs         # Meta report orchestration, action flattening
-│   ├── TikTokConfig.gs          # TikTok API constants, metrics/dimensions catalog
-│   ├── TikTokAuth.gs            # TikTok OAuth (custom auth_code exchange flow)
-│   ├── TikTokApi.gs             # TikTok Business API calls (advertisers, reports)
-│   ├── TikTokReportBuilder.gs   # TikTok report orchestration, data flattening
-│   ├── SheetWriter.gs           # Shared: sheet creation, formatting, data writing
-│   └── Scheduler.gs             # Shared: trigger management for recurring reports
+│   ├── Code.gs                    # Entry point, menu, sidebar launcher
+│   ├── Config.gs                  # Meta: API constants, 50+ metrics catalog
+│   ├── Auth.gs                    # Meta: OAuth2 via apps-script-oauth2
+│   ├── MetaApi.gs                 # Meta: Marketing API calls
+│   ├── ReportBuilder.gs           # Meta: report orchestration, action flattening
+│   ├── TikTokConfig.gs            # TikTok: API constants, 40+ metrics catalog
+│   ├── TikTokAuth.gs              # TikTok: custom auth_code exchange flow
+│   ├── TikTokApi.gs               # TikTok: Business API calls
+│   ├── TikTokReportBuilder.gs     # TikTok: report orchestration
+│   ├── SnapchatConfig.gs          # Snapchat: API constants, 30+ metrics catalog
+│   ├── SnapchatAuth.gs            # Snapchat: OAuth2 via apps-script-oauth2
+│   ├── SnapchatApi.gs             # Snapchat: Marketing API calls
+│   ├── SnapchatReportBuilder.gs   # Snapchat: report orchestration
+│   ├── RedditConfig.gs            # Reddit: API constants, 25+ metrics catalog
+│   ├── RedditAuth.gs              # Reddit: OAuth2 via apps-script-oauth2
+│   ├── RedditApi.gs               # Reddit: Ads API v3 calls
+│   ├── RedditReportBuilder.gs     # Reddit: report orchestration
+│   ├── PinterestConfig.gs         # Pinterest: API constants, 30+ metrics catalog
+│   ├── PinterestAuth.gs           # Pinterest: OAuth2 with Basic auth header
+│   ├── PinterestApi.gs            # Pinterest: API v5 calls
+│   ├── PinterestReportBuilder.gs  # Pinterest: report orchestration
+│   ├── SheetWriter.gs             # Shared: sheet creation, per-platform formatting
+│   └── Scheduler.gs               # Shared: trigger management for recurring reports
 ├── ui/
-│   └── Sidebar.html             # Full sidebar UI (HTML/CSS/JS, multi-platform)
-├── archive/                     # Legacy scripts (pre-rewrite, Facebook API v5.0)
+│   └── Sidebar.html               # Full sidebar UI (HTML/CSS/JS, 5-platform tabs)
+├── archive/                       # Legacy scripts (pre-rewrite, Facebook API v5.0)
+├── SETUP_GUIDE.md                 # Step-by-step setup for all 5 platforms
 └── README.md
 ```
 
@@ -56,18 +71,15 @@ In Apps Script, go to **Libraries** and add:
 - Version: latest (43+)
 - Identifier: `OAuth2`
 
-### 3. Configure Meta Ads (optional)
+### 3. Configure Ad Platforms
 
-1. Create a [Meta App](https://developers.facebook.com/apps/) with the **Marketing API** product
-2. Add **Facebook Login** product and set the OAuth Redirect URI (shown in the sidebar)
-3. Open the sidebar, enter your App ID and App Secret, and click **Connect Meta Account**
+See **[SETUP_GUIDE.md](SETUP_GUIDE.md)** for detailed step-by-step instructions for each platform:
 
-### 4. Configure TikTok Ads (optional)
-
-1. Create a TikTok App at the [Business API Portal](https://business-api.tiktok.com/portal)
-2. Add the **Reporting** permission scope
-3. Open the sidebar, switch to the **TikTok Ads** tab, enter your App ID and Secret
-4. Click **Connect**, authorize on TikTok, then paste the `auth_code` from the redirect URL
+- **Meta** — Create a Facebook App with Marketing API + Facebook Login products
+- **TikTok** — Create a TikTok Business API app with Reporting scope
+- **Snapchat** — Create a Snap Developer Application and apply for Marketing API access
+- **Reddit** — Create a Reddit Developer Application at ads.reddit.com
+- **Pinterest** — Create a Pinterest App and request Ads API access
 
 ## Usage
 

@@ -169,11 +169,11 @@
 
 <!-- ═══════════════ PLATFORM TABS ═══════════════════════════════════════ -->
 <div class="platform-tabs" id="platformTabs">
-  <button class="platform-tab active" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
-  <button class="platform-tab" data-platform="tiktok" onclick="switchPlatform('tiktok')">TikTok Ads</button>
-  <button class="platform-tab disabled" data-platform="snap">Snapchat<span class="coming-soon">soon</span></button>
-  <button class="platform-tab disabled" data-platform="reddit">Reddit<span class="coming-soon">soon</span></button>
-  <button class="platform-tab disabled" data-platform="pinterest">Pinterest<span class="coming-soon">soon</span></button>
+  <button class="platform-tab active" data-platform="meta" onclick="switchPlatform('meta')">Meta</button>
+  <button class="platform-tab" data-platform="tiktok" onclick="switchPlatform('tiktok')">TikTok</button>
+  <button class="platform-tab" data-platform="snapchat" onclick="switchPlatform('snapchat')">Snapchat</button>
+  <button class="platform-tab" data-platform="reddit" onclick="switchPlatform('reddit')">Reddit</button>
+  <button class="platform-tab" data-platform="pinterest" onclick="switchPlatform('pinterest')">Pinterest</button>
 </div>
 
 <div class="content">
@@ -244,6 +244,54 @@
         <input type="text" id="tiktokAuthCode" placeholder="Paste auth_code here">
         <button class="btn btn-primary btn-small" onclick="exchangeTikTokCode()">Connect</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ── SNAPCHAT credentials ── -->
+  <div class="platform-section snapchat-only" id="snapCredSection" style="display:none;">
+    <div class="cred-section" id="snapCredForm">
+      <p class="helper-text">
+        Create a Snap App at
+        <a href="https://business.snapchat.com/" target="_blank">Snap Business Manager</a>,
+        apply for Marketing API access, then paste your Client ID and Secret below.
+      </p>
+      <label>Client ID</label>
+      <input type="text" id="snapClientId" placeholder="Your Snap client_id">
+      <label>Client Secret</label>
+      <input type="password" id="snapClientSecret" placeholder="Your Snap client_secret">
+      <button class="btn btn-secondary" onclick="saveSnapCreds()">Save Credentials</button>
+    </div>
+  </div>
+
+  <!-- ── REDDIT credentials ── -->
+  <div class="platform-section reddit-only" id="redditCredSection" style="display:none;">
+    <div class="cred-section" id="redditCredForm">
+      <p class="helper-text">
+        Create a Reddit App at
+        <a href="https://ads.reddit.com" target="_blank">ads.reddit.com</a>
+        under Developer Applications, then paste your Client ID and Secret below.
+      </p>
+      <label>Client ID</label>
+      <input type="text" id="redditClientId" placeholder="Your Reddit client_id">
+      <label>Client Secret</label>
+      <input type="password" id="redditClientSecret" placeholder="Your Reddit client_secret">
+      <button class="btn btn-secondary" onclick="saveRedditCreds()">Save Credentials</button>
+    </div>
+  </div>
+
+  <!-- ── PINTEREST credentials ── -->
+  <div class="platform-section pinterest-only" id="pinterestCredSection" style="display:none;">
+    <div class="cred-section" id="pinterestCredForm">
+      <p class="helper-text">
+        Create a Pinterest App at
+        <a href="https://developers.pinterest.com/apps/" target="_blank">Pinterest Developers</a>,
+        then paste your App ID and Secret below.
+      </p>
+      <label>App ID</label>
+      <input type="text" id="pinterestClientId" placeholder="Your Pinterest app_id">
+      <label>App Secret</label>
+      <input type="password" id="pinterestClientSecret" placeholder="Your Pinterest app_secret">
+      <button class="btn btn-secondary" onclick="savePinterestCreds()">Save Credentials</button>
     </div>
   </div>
 
@@ -325,6 +373,12 @@
   <div id="timeIncrementRow">
     <label>Time Increment</label>
     <select id="timeIncrementSelect"></select>
+  </div>
+
+  <!-- Granularity (Snap/Reddit/Pinterest) -->
+  <div id="granularityRow" style="display:none;">
+    <label>Granularity</label>
+    <select id="granularitySelect"></select>
   </div>
 
   <!-- Breakdowns / Dimensions -->
@@ -466,6 +520,7 @@
       breakdownsLabel: 'Dimensions',
       useDatePresets: false,
       useTimeIncrement: false,
+      useGranularity: false,
       essentialMetrics: [
         'campaign_name','impressions','reach','spend','clicks','ctr','cpc','cpm'
       ],
@@ -475,6 +530,62 @@
         'likes','comments','shares','follows',
         'conversion','cost_per_conversion','conversion_rate',
         'complete_payment'
+      ]
+    },
+    snapchat: {
+      accent: '#FFFC00',
+      accentText: '#000',
+      authTitle: 'Connect to Snapchat',
+      acctTitle: 'Select Ad Account',
+      acctLabel: 'Ad Account',
+      breakdownsLabel: 'Dimension (one at a time)',
+      useDatePresets: false,
+      useTimeIncrement: false,
+      useGranularity: true,
+      essentialMetrics: ['impressions','spend','swipes','video_views','uniques'],
+      performanceMetrics: [
+        'impressions','spend','swipes','video_views','uniques','frequency',
+        'shares','saves','story_opens','story_completes',
+        'engaged_views','landing_page_views',
+        'quartile_1','quartile_2','quartile_3','view_completion',
+        'conversion_purchases','conversion_purchases_value'
+      ]
+    },
+    reddit: {
+      accent: '#FF4500',
+      authTitle: 'Connect to Reddit',
+      acctTitle: 'Select Ad Account',
+      acctLabel: 'Ad Account',
+      breakdownsLabel: 'Breakdown (optional)',
+      useDatePresets: false,
+      useTimeIncrement: false,
+      useGranularity: true,
+      essentialMetrics: ['impressions','spend','clicks','ecpm','ctr','cpc'],
+      performanceMetrics: [
+        'impressions','spend','clicks','reach','ecpm','ctr','cpc',
+        'upvotes','comments','shares','follows',
+        'video_watched_25_percent','video_watched_50_percent',
+        'video_watched_75_percent','video_watched_100_percent',
+        'conversion_purchase_clicks','conversion_lead_clicks'
+      ]
+    },
+    pinterest: {
+      accent: '#E60023',
+      authTitle: 'Connect to Pinterest',
+      acctTitle: 'Select Ad Account',
+      acctLabel: 'Ad Account',
+      breakdownsLabel: 'Targeting Dimension',
+      useDatePresets: false,
+      useTimeIncrement: false,
+      useGranularity: true,
+      essentialMetrics: ['SPEND_IN_DOLLAR','PAID_IMPRESSION','TOTAL_CLICKTHROUGH','CTR','ECPC_IN_DOLLAR','ECPM_IN_DOLLAR'],
+      performanceMetrics: [
+        'SPEND_IN_DOLLAR','PAID_IMPRESSION','TOTAL_CLICKTHROUGH','CTR',
+        'ECPC_IN_DOLLAR','ECPM_IN_DOLLAR','PIN_CLICK','OUTBOUND_CLICK',
+        'TOTAL_ENGAGEMENT','ENGAGEMENT_RATE','SAVE','SAVE_RATE',
+        'VIDEO_MRC_VIEW','VIDEO_P25_COMBINED','VIDEO_P50_COMBINED',
+        'VIDEO_P75_COMBINED','VIDEO_P100_COMBINED',
+        'TOTAL_CONVERSIONS','CHECKOUT_ROAS'
       ]
     }
   };
@@ -533,6 +644,7 @@
     document.getElementById('datePresetRow').style.display = cfg.useDatePresets ? 'block' : 'none';
     document.getElementById('customDates').style.display = cfg.useDatePresets ? 'none' : 'flex';
     document.getElementById('timeIncrementRow').style.display = cfg.useTimeIncrement ? 'block' : 'none';
+    document.getElementById('granularityRow').style.display = cfg.useGranularity ? 'block' : 'none';
 
     // Set default dates for non-preset platforms
     if (!cfg.useDatePresets) {
@@ -548,17 +660,27 @@
   }
 
   function togglePlatformSections(platform) {
-    // Meta sections
-    var metaSections = document.querySelectorAll('.meta-only');
-    metaSections.forEach(function(el) { el.style.display = platform === 'meta' ? 'block' : 'none'; });
-    // TikTok sections
-    var tiktokSections = document.querySelectorAll('.tiktok-only');
-    tiktokSections.forEach(function(el) { el.style.display = platform === 'tiktok' ? 'block' : 'none'; });
+    var platforms = ['meta', 'tiktok', 'snapchat', 'reddit', 'pinterest'];
+    platforms.forEach(function(p) {
+      var sections = document.querySelectorAll('.' + p + '-only');
+      sections.forEach(function(el) { el.style.display = platform === p ? 'block' : 'none'; });
+    });
   }
 
   // ── Auth ───────────────────────────────────────────────────────────
+  var AUTH_FN_MAP = {
+    meta: 'getAuthStatus', tiktok: 'getTikTokAuthStatus',
+    snapchat: 'getSnapAuthStatus', reddit: 'getRedditAuthStatus',
+    pinterest: 'getPinterestAuthStatus'
+  };
+  var DISCONNECT_FN_MAP = {
+    meta: 'disconnectMeta', tiktok: 'disconnectTikTok',
+    snapchat: 'disconnectSnapchat', reddit: 'disconnectReddit',
+    pinterest: 'disconnectPinterest'
+  };
+
   function checkAuth() {
-    var fn = activePlatform === 'meta' ? 'getAuthStatus' : 'getTikTokAuthStatus';
+    var fn = AUTH_FN_MAP[activePlatform];
     google.script.run.withSuccessHandler(function(json) {
       updateAuthUI(JSON.parse(json));
     }).withFailureHandler(showError)[fn]();
@@ -572,10 +694,15 @@
     var btnDisconnect = document.getElementById('btnDisconnect');
     var btnNext       = document.getElementById('btnNext1');
 
-    // Hide cred forms when connected
-    var metaCredForm   = document.getElementById('metaCredForm');
-    var tiktokCredForm = document.getElementById('tiktokCredForm');
-    var tiktokAuthCode = document.getElementById('tiktokAuthCodeSection');
+    // Cred form IDs per platform
+    var credForms = {
+      meta: 'metaCredForm', tiktok: 'tiktokCredForm',
+      snapchat: 'snapCredForm', reddit: 'redditCredForm',
+      pinterest: 'pinterestCredForm'
+    };
+    var currentCredForm = document.getElementById(credForms[activePlatform]);
+    var tiktokAuthCode  = document.getElementById('tiktokAuthCodeSection');
+    var platformLabel = activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1);
 
     if (auth.status === 'connected') {
       badge.className = 'auth-badge connected';
@@ -584,20 +711,20 @@
       btnConnect.style.display    = 'none';
       btnDisconnect.style.display = 'inline-flex';
       btnNext.disabled = false;
-      if (activePlatform === 'meta') metaCredForm.style.display = 'none';
-      if (activePlatform === 'tiktok') { tiktokCredForm.style.display = 'none'; tiktokAuthCode.style.display = 'none'; }
+      if (currentCredForm) currentCredForm.style.display = 'none';
+      if (tiktokAuthCode) tiktokAuthCode.style.display = 'none';
 
     } else if (auth.status === 'disconnected') {
       badge.className = 'auth-badge disconnected';
       dot.className   = 'dot red';
       label.textContent = 'Not connected';
       btnConnect.style.display    = 'inline-flex';
-      btnConnect.textContent      = 'Connect ' + (activePlatform === 'meta' ? 'Meta' : 'TikTok');
+      btnConnect.textContent      = 'Connect ' + platformLabel;
       btnConnect.onclick = function() { window.open(auth.authUrl); };
       btnDisconnect.style.display = 'none';
       btnNext.disabled = true;
-      if (activePlatform === 'meta') metaCredForm.style.display = 'none';
-      if (activePlatform === 'tiktok') { tiktokCredForm.style.display = 'none'; tiktokAuthCode.style.display = 'block'; }
+      if (currentCredForm) currentCredForm.style.display = 'none';
+      if (tiktokAuthCode) tiktokAuthCode.style.display = activePlatform === 'tiktok' ? 'block' : 'none';
 
     } else { // no_credentials
       badge.className = 'auth-badge disconnected';
@@ -606,8 +733,8 @@
       btnConnect.style.display    = 'none';
       btnDisconnect.style.display = 'none';
       btnNext.disabled = true;
-      if (activePlatform === 'meta') metaCredForm.style.display = 'block';
-      if (activePlatform === 'tiktok') { tiktokCredForm.style.display = 'block'; tiktokAuthCode.style.display = 'none'; }
+      if (currentCredForm) currentCredForm.style.display = 'block';
+      if (tiktokAuthCode) tiktokAuthCode.style.display = 'none';
     }
   }
 
@@ -632,6 +759,36 @@
     }).withFailureHandler(showError).saveTikTokCredentials(id, secret);
   }
 
+  function saveSnapCreds() {
+    var id = document.getElementById('snapClientId').value;
+    var secret = document.getElementById('snapClientSecret').value;
+    if (!id || !secret) { showStatus('Enter both Client ID and Secret.', 'error'); return; }
+    google.script.run.withSuccessHandler(function(json) {
+      updateAuthUI(JSON.parse(json));
+      showStatus('Snapchat credentials saved.', 'success');
+    }).withFailureHandler(showError).saveSnapCredentials(id, secret);
+  }
+
+  function saveRedditCreds() {
+    var id = document.getElementById('redditClientId').value;
+    var secret = document.getElementById('redditClientSecret').value;
+    if (!id || !secret) { showStatus('Enter both Client ID and Secret.', 'error'); return; }
+    google.script.run.withSuccessHandler(function(json) {
+      updateAuthUI(JSON.parse(json));
+      showStatus('Reddit credentials saved.', 'success');
+    }).withFailureHandler(showError).saveRedditCredentials(id, secret);
+  }
+
+  function savePinterestCreds() {
+    var id = document.getElementById('pinterestClientId').value;
+    var secret = document.getElementById('pinterestClientSecret').value;
+    if (!id || !secret) { showStatus('Enter both App ID and Secret.', 'error'); return; }
+    google.script.run.withSuccessHandler(function(json) {
+      updateAuthUI(JSON.parse(json));
+      showStatus('Pinterest credentials saved.', 'success');
+    }).withFailureHandler(showError).savePinterestCredentials(id, secret);
+  }
+
   function exchangeTikTokCode() {
     var code = document.getElementById('tiktokAuthCode').value;
     if (!code) { showStatus('Please paste the auth_code.', 'error'); return; }
@@ -647,7 +804,7 @@
   }
 
   function handleDisconnect() {
-    var fn = activePlatform === 'meta' ? 'disconnectMeta' : 'disconnectTikTok';
+    var fn = DISCONNECT_FN_MAP[activePlatform];
     google.script.run.withSuccessHandler(function(json) {
       updateAuthUI(JSON.parse(json));
       showStatus('Disconnected.', 'info');
@@ -662,18 +819,27 @@
   }
 
   // ── Catalogs ───────────────────────────────────────────────────────
+  var CATALOG_MAP = {
+    meta:      { metrics: 'getMetricsCatalog', dims: 'getBreakdownsCatalog', levels: 'getReportingLevels', defaultLevel: 'campaign' },
+    tiktok:    { metrics: 'getTikTokMetricsCatalog', dims: 'getTikTokDimensions', levels: 'getTikTokDataLevels', defaultLevel: 'AUCTION_CAMPAIGN' },
+    snapchat:  { metrics: 'getSnapMetricsCatalog', dims: 'getSnapDimensions', levels: 'getSnapDataLevels', defaultLevel: 'campaigns', granularities: 'getSnapGranularities' },
+    reddit:    { metrics: 'getRedditMetricsCatalog', dims: 'getRedditDimensions', levels: 'getRedditDataLevels', defaultLevel: 'campaign', granularities: 'getRedditGranularities' },
+    pinterest: { metrics: 'getPinterestMetricsCatalog', dims: 'getPinterestDimensions', levels: 'getPinterestDataLevels', defaultLevel: 'CAMPAIGN', granularities: 'getPinterestGranularities' }
+  };
+
   function loadCatalogs() {
+    var cat = CATALOG_MAP[activePlatform];
+    google.script.run.withSuccessHandler(function(j) { metricsCatalog = JSON.parse(j); renderMetricChips(); })[cat.metrics]();
+    google.script.run.withSuccessHandler(function(j) { breakdownsCatalog = JSON.parse(j); renderBreakdownChips(); })[cat.dims]();
+    google.script.run.withSuccessHandler(function(j) { populateSelect('levelSelect', JSON.parse(j), cat.defaultLevel); })[cat.levels]();
+
     if (activePlatform === 'meta') {
-      google.script.run.withSuccessHandler(function(j) { metricsCatalog = JSON.parse(j); renderMetricChips(); }).getMetricsCatalog();
-      google.script.run.withSuccessHandler(function(j) { breakdownsCatalog = JSON.parse(j); renderBreakdownChips(); }).getBreakdownsCatalog();
       google.script.run.withSuccessHandler(function(j) { populateSelect('datePresetSelect', JSON.parse(j), 'last_30d'); }).getDatePresets();
       google.script.run.withSuccessHandler(function(j) { populateSelect('timeIncrementSelect', JSON.parse(j), '1'); }).getTimeIncrements();
-      google.script.run.withSuccessHandler(function(j) { populateSelect('levelSelect', JSON.parse(j), 'campaign'); }).getReportingLevels();
       loadMetaRedirectUri();
-    } else if (activePlatform === 'tiktok') {
-      google.script.run.withSuccessHandler(function(j) { metricsCatalog = JSON.parse(j); renderMetricChips(); }).getTikTokMetricsCatalog();
-      google.script.run.withSuccessHandler(function(j) { breakdownsCatalog = JSON.parse(j); renderBreakdownChips(); }).getTikTokDimensions();
-      google.script.run.withSuccessHandler(function(j) { populateSelect('levelSelect', JSON.parse(j), 'AUCTION_CAMPAIGN'); }).getTikTokDataLevels();
+    }
+    if (cat.granularities) {
+      google.script.run.withSuccessHandler(function(j) { populateSelect('granularitySelect', JSON.parse(j), 'DAY'); })[cat.granularities]();
     }
   }
 
@@ -704,41 +870,39 @@
     sel.innerHTML = '<option value="">Loading accounts...</option>';
     document.getElementById('btnNext2').disabled = true;
 
-    if (activePlatform === 'meta') {
-      google.script.run.withSuccessHandler(function(json) {
-        adAccounts = JSON.parse(json);
-        sel.innerHTML = '<option value="">-- Select an account --</option>';
-        adAccounts.forEach(function(a) {
-          var opt = document.createElement('option');
-          opt.value = a.id;
-          opt.textContent = a.name + ' (' + a.account_id + ')';
-          sel.appendChild(opt);
-        });
-        sel.onchange = function() {
-          document.getElementById('btnNext2').disabled = !sel.value;
-          var acct = adAccounts.find(function(a) { return a.id === sel.value; });
-          var info = document.getElementById('accountInfo');
-          if (acct) { info.style.display = 'block'; info.textContent = 'Currency: ' + acct.currency + ' | TZ: ' + acct.timezone_name; }
-          else { info.style.display = 'none'; }
-        };
-      }).withFailureHandler(function(e) { sel.innerHTML = '<option>Error loading</option>'; showError(e); }).fetchAdAccounts();
+    var ACCT_FN_MAP = {
+      meta: 'fetchAdAccounts', tiktok: 'fetchTikTokAdvertisers',
+      snapchat: 'fetchSnapAdAccounts', reddit: 'fetchRedditAdAccounts',
+      pinterest: 'fetchPinterestAdAccounts'
+    };
+    var fn = ACCT_FN_MAP[activePlatform];
 
-    } else if (activePlatform === 'tiktok') {
-      google.script.run.withSuccessHandler(function(json) {
-        adAccounts = JSON.parse(json);
-        sel.innerHTML = '<option value="">-- Select an advertiser --</option>';
-        adAccounts.forEach(function(a) {
-          var opt = document.createElement('option');
-          opt.value = a.advertiser_id;
-          opt.textContent = a.advertiser_name + ' (' + a.advertiser_id + ')';
-          sel.appendChild(opt);
-        });
-        sel.onchange = function() {
-          document.getElementById('btnNext2').disabled = !sel.value;
-          document.getElementById('accountInfo').style.display = 'none';
-        };
-      }).withFailureHandler(function(e) { sel.innerHTML = '<option>Error loading</option>'; showError(e); }).fetchTikTokAdvertisers();
-    }
+    google.script.run.withSuccessHandler(function(json) {
+      adAccounts = JSON.parse(json);
+      sel.innerHTML = '<option value="">-- Select an account --</option>';
+      adAccounts.forEach(function(a) {
+        var opt = document.createElement('option');
+        // Normalize ID field
+        opt.value = a.id || a.advertiser_id || '';
+        var name = a.name || a.advertiser_name || ('Account ' + opt.value);
+        var idLabel = a.account_id || a.advertiser_id || opt.value;
+        opt.textContent = name + ' (' + idLabel + ')';
+        sel.appendChild(opt);
+      });
+      sel.onchange = function() {
+        document.getElementById('btnNext2').disabled = !sel.value;
+        var info = document.getElementById('accountInfo');
+        var acct = adAccounts.find(function(a) { return (a.id || a.advertiser_id) === sel.value; });
+        if (acct && (acct.currency || acct.timezone_name || acct.timezone || acct.country)) {
+          info.style.display = 'block';
+          var parts = [];
+          if (acct.currency) parts.push('Currency: ' + acct.currency);
+          if (acct.timezone_name || acct.timezone) parts.push('TZ: ' + (acct.timezone_name || acct.timezone));
+          if (acct.country) parts.push('Country: ' + acct.country);
+          info.textContent = parts.join(' | ');
+        } else { info.style.display = 'none'; }
+      };
+    }).withFailureHandler(function(e) { sel.innerHTML = '<option>Error loading</option>'; showError(e); })[fn]();
   }
 
   // ── Metric / Breakdown chips ───────────────────────────────────────
@@ -840,7 +1004,8 @@
       dateTxt = document.getElementById('dateSince').value + ' to ' + document.getElementById('dateUntil').value;
     }
 
-    var html = '<strong>Platform:</strong> ' + activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1) + '<br>'
+    var platformNames = { meta:'Meta', tiktok:'TikTok', snapchat:'Snapchat', reddit:'Reddit', pinterest:'Pinterest' };
+    var html = '<strong>Platform:</strong> ' + (platformNames[activePlatform] || activePlatform) + '<br>'
       + '<strong>Account:</strong> ' + acctName + '<br>'
       + '<strong>Level:</strong> ' + levelTxt + '<br>'
       + '<strong>Period:</strong> ' + dateTxt + '<br>'
@@ -862,7 +1027,12 @@
     document.getElementById('runStatus').textContent = 'Requesting data from ' + activePlatform + '...';
 
     var config = buildReportConfig();
-    var fn = activePlatform === 'meta' ? 'runReportFromSidebar' : 'runTikTokReportFromSidebar';
+    var RUN_FN_MAP = {
+      meta: 'runReportFromSidebar', tiktok: 'runTikTokReportFromSidebar',
+      snapchat: 'runSnapchatReportFromSidebar', reddit: 'runRedditReportFromSidebar',
+      pinterest: 'runPinterestReportFromSidebar'
+    };
+    var fn = RUN_FN_MAP[activePlatform];
 
     google.script.run
       .withSuccessHandler(function(json) {
@@ -882,13 +1052,14 @@
 
   function buildReportConfig() {
     var sel = document.getElementById('accountSelect');
+    var acct = adAccounts.find(function(a) { return (a.id || a.advertiser_id) === sel.value; });
+    var acctName = acct ? (acct.name || acct.advertiser_name) : 'Report';
 
     if (activePlatform === 'meta') {
-      var acct = adAccounts.find(function(a) { return a.id === sel.value; });
       var datePreset = document.getElementById('datePresetSelect').value;
       return {
         accountId:          sel.value,
-        accountName:        acct ? acct.name : 'Report',
+        accountName:        acctName,
         level:              document.getElementById('levelSelect').value,
         datePreset:         datePreset,
         since:              datePreset === 'custom' ? document.getElementById('dateSince').value : null,
@@ -898,13 +1069,25 @@
         selectedBreakdowns: selectedBreakdowns
       };
     } else if (activePlatform === 'tiktok') {
-      var acct2 = adAccounts.find(function(a) { return a.advertiser_id === sel.value; });
       return {
         advertiserId:       sel.value,
-        advertiserName:     acct2 ? acct2.advertiser_name : 'Report',
+        advertiserName:     acctName,
         dataLevel:          document.getElementById('levelSelect').value,
         startDate:          document.getElementById('dateSince').value,
         endDate:            document.getElementById('dateUntil').value,
+        selectedMetrics:    selectedMetrics,
+        selectedDimensions: selectedBreakdowns
+      };
+    } else {
+      // Snapchat, Reddit, Pinterest — common shape
+      var granSel = document.getElementById('granularitySelect');
+      return {
+        accountId:          sel.value,
+        accountName:        acctName,
+        dataLevel:          document.getElementById('levelSelect').value,
+        startDate:          document.getElementById('dateSince').value,
+        endDate:            document.getElementById('dateUntil').value,
+        granularity:        granSel ? granSel.value : 'DAY',
         selectedMetrics:    selectedMetrics,
         selectedDimensions: selectedBreakdowns
       };
