@@ -11,7 +11,8 @@ function onOpen(e) {
     .createAddonMenu()
     .addItem('Open Sidebar', 'showSidebar')
     .addSeparator()
-    .addItem('Run Last Report', 'rerunLastReport')
+    .addItem('Re-run Last Meta Report', 'rerunLastMetaReport')
+    .addItem('Re-run Last TikTok Report', 'rerunLastTikTokReport')
     .addToUi();
 }
 
@@ -35,18 +36,18 @@ function onHomepage(e) {
 function showSidebar() {
   var html = HtmlService.createHtmlOutputFromFile('ui/Sidebar')
     .setTitle('Social Ads Reporter')
-    .setWidth(320);
+    .setWidth(340);
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
 /**
- * Re-runs the last report configuration (stored in user properties).
+ * Re-runs the last Meta report.
  */
-function rerunLastReport() {
+function rerunLastMetaReport() {
   var props = PropertiesService.getUserProperties();
   var lastConfig = props.getProperty('LAST_REPORT_CONFIG');
   if (!lastConfig) {
-    SpreadsheetApp.getUi().alert('No previous report found. Use the sidebar to configure a report.');
+    SpreadsheetApp.getUi().alert('No previous Meta report found. Use the sidebar to configure one.');
     return;
   }
   var result = JSON.parse(runReport(JSON.parse(lastConfig)));
@@ -54,11 +55,24 @@ function rerunLastReport() {
 }
 
 /**
- * Called from the sidebar to run a report and store the config for re-runs.
+ * Re-runs the last TikTok report.
+ */
+function rerunLastTikTokReport() {
+  var props = PropertiesService.getUserProperties();
+  var lastConfig = props.getProperty('LAST_TIKTOK_REPORT_CONFIG');
+  if (!lastConfig) {
+    SpreadsheetApp.getUi().alert('No previous TikTok report found. Use the sidebar to configure one.');
+    return;
+  }
+  var result = JSON.parse(runTikTokReport(JSON.parse(lastConfig)));
+  SpreadsheetApp.getUi().alert(result.message);
+}
+
+/**
+ * Called from the sidebar to run a Meta report and store config for re-runs.
  */
 function runReportFromSidebar(uiConfigJson) {
   var uiConfig = JSON.parse(uiConfigJson);
-  // Store for re-run
   PropertiesService.getUserProperties().setProperty('LAST_REPORT_CONFIG', uiConfigJson);
   return runReport(uiConfig);
 }

@@ -10,27 +10,56 @@
       font-size: 13px;
       color: #202124;
       background: #fff;
-      padding: 16px;
     }
 
     /* ── Typography ────────────────────────────────────────────────────── */
-    h2 { font-size: 16px; font-weight: 500; margin-bottom: 12px; color: #1a73e8; }
-    h3 { font-size: 13px; font-weight: 500; margin: 12px 0 6px; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
+    h2 { font-size: 15px; font-weight: 500; margin-bottom: 12px; }
+    h3 { font-size: 12px; font-weight: 600; margin: 12px 0 6px; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
     label { display: block; font-size: 12px; font-weight: 500; margin-bottom: 4px; color: #5f6368; }
+    a { color: #1a73e8; }
 
-    /* ── Steps / Sections ─────────────────────────────────────────────── */
+    /* ── Platform tabs ─────────────────────────────────────────────────── */
+    .platform-tabs {
+      display: flex; border-bottom: 2px solid #e0e0e0;
+      background: #f8f9fa; padding: 0 8px;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .platform-tab {
+      padding: 10px 14px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: none; background: none;
+      color: #5f6368; position: relative;
+      transition: color 0.15s; white-space: nowrap;
+    }
+    .platform-tab:hover { color: #202124; }
+    .platform-tab.active { color: var(--accent); }
+    .platform-tab.active::after {
+      content: ''; position: absolute; bottom: -2px; left: 0; right: 0;
+      height: 2px; background: var(--accent);
+    }
+    .platform-tab.disabled {
+      color: #bdc1c6; cursor: default; pointer-events: none;
+    }
+    .platform-tab .coming-soon {
+      font-size: 9px; font-weight: 400; color: #9aa0a6;
+      display: block; line-height: 1;
+    }
+
+    /* ── Content area ──────────────────────────────────────────────────── */
+    .content { padding: 16px; }
+
+    /* ── Steps ─────────────────────────────────────────────────────────── */
     .step { display: none; }
     .step.active { display: block; }
     .step-header {
       display: flex; align-items: center; gap: 8px;
-      margin-bottom: 16px; padding-bottom: 8px;
-      border-bottom: 2px solid #1877F2;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 2px solid var(--accent);
     }
     .step-num {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: #1877F2; color: #fff;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: 700; flex-shrink: 0;
+      font-size: 11px; font-weight: 700; flex-shrink: 0;
     }
 
     /* ── Form controls ────────────────────────────────────────────────── */
@@ -39,7 +68,7 @@
       border-radius: 4px; font-size: 13px; margin-bottom: 10px;
       background: #fff; color: #202124;
     }
-    select:focus, input:focus { outline: none; border-color: #1877F2; }
+    select:focus, input:focus { outline: none; border-color: var(--accent); }
 
     /* ── Buttons ───────────────────────────────────────────────────────── */
     .btn {
@@ -50,15 +79,15 @@
       width: 100%; margin-top: 6px;
     }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-primary { background: #1877F2; color: #fff; }
-    .btn-primary:hover:not(:disabled) { background: #166fe5; }
-    .btn-secondary { background: #f0f2f5; color: #1877F2; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover:not(:disabled) { filter: brightness(0.92); }
+    .btn-secondary { background: #f0f2f5; color: var(--accent); }
     .btn-secondary:hover:not(:disabled) { background: #e4e6eb; }
     .btn-danger { background: #fff; color: #e74c3c; border: 1px solid #e74c3c; }
     .btn-danger:hover:not(:disabled) { background: #fdf0ef; }
     .btn-small { width: auto; padding: 4px 12px; font-size: 12px; margin: 0; }
 
-    /* ── Status / alerts ──────────────────────────────────────────────── */
+    /* ── Status bar ───────────────────────────────────────────────────── */
     .status-bar {
       padding: 8px 12px; border-radius: 4px; margin-bottom: 12px;
       font-size: 12px; display: none;
@@ -69,7 +98,7 @@
     .status-bar.info    { background: #e3f2fd; color: #1565c0; }
     .status-bar.warn    { background: #fff8e1; color: #f57f17; }
 
-    /* ── Connected badge ──────────────────────────────────────────────── */
+    /* ── Auth badge ───────────────────────────────────────────────────── */
     .auth-badge {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 500;
@@ -80,11 +109,11 @@
     .dot.green { background: #2e7d32; }
     .dot.red   { background: #c62828; }
 
-    /* ── Metric chips ─────────────────────────────────────────────────── */
+    /* ── Chips ─────────────────────────────────────────────────────────── */
     .chip-group { margin-bottom: 8px; }
     .chip-category { margin-bottom: 10px; }
     .chip-category-label {
-      font-size: 11px; font-weight: 600; color: #1877F2;
+      font-size: 11px; font-weight: 600; color: var(--accent);
       margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;
     }
     .chips { display: flex; flex-wrap: wrap; gap: 4px; }
@@ -94,71 +123,65 @@
       font-size: 11px; cursor: pointer; user-select: none;
       transition: all 0.15s;
     }
-    .chip:hover { border-color: #1877F2; background: #f0f6ff; }
-    .chip.selected { background: #1877F2; color: #fff; border-color: #1877F2; }
+    .chip:hover { border-color: var(--accent); background: #f0f6ff; }
+    .chip.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-    /* ── Navigation ───────────────────────────────────────────────────── */
+    /* ── Misc ──────────────────────────────────────────────────────────── */
     .nav-row { display: flex; gap: 8px; margin-top: 16px; }
     .nav-row .btn { flex: 1; }
-
-    /* ── Schedule list ────────────────────────────────────────────────── */
     .schedule-item {
       display: flex; justify-content: space-between; align-items: center;
       padding: 8px; border: 1px solid #dadce0; border-radius: 4px;
       margin-bottom: 6px; font-size: 12px;
     }
-
-    /* ── Progress ─────────────────────────────────────────────────────── */
     .progress-bar { height: 4px; background: #e0e0e0; border-radius: 2px; margin: 8px 0; }
-    .progress-fill {
-      height: 100%; background: #1877F2; border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-
-    /* ── Stepper ──────────────────────────────────────────────────────── */
-    .stepper { display: flex; justify-content: center; gap: 4px; margin-bottom: 16px; }
+    .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.3s ease; }
+    .stepper { display: flex; justify-content: center; gap: 4px; margin-bottom: 14px; }
     .stepper-dot {
       width: 8px; height: 8px; border-radius: 50%;
       background: #dadce0; transition: background 0.2s;
     }
-    .stepper-dot.active { background: #1877F2; }
+    .stepper-dot.active { background: var(--accent); }
     .stepper-dot.done { background: #42B72A; }
-
-    /* ── Credentials form ─────────────────────────────────────────────── */
-    .cred-section {
-      background: #f8f9fa; padding: 12px; border-radius: 6px;
-      margin-bottom: 12px;
-    }
+    .cred-section { background: #f8f9fa; padding: 12px; border-radius: 6px; margin-bottom: 12px; }
     .helper-text { font-size: 11px; color: #80868b; margin-bottom: 8px; line-height: 1.4; }
-
-    /* ── Scrollable metric picker ─────────────────────────────────────── */
     .metric-picker {
-      max-height: 320px; overflow-y: auto; padding-right: 4px;
-      border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px;
-      margin-bottom: 8px;
+      max-height: 280px; overflow-y: auto; padding: 10px;
+      border: 1px solid #e0e0e0; border-radius: 6px; margin-bottom: 8px;
     }
-
-    /* ── Loading spinner ──────────────────────────────────────────────── */
     .spinner {
       display: inline-block; width: 14px; height: 14px;
       border: 2px solid #fff; border-top-color: transparent;
       border-radius: 50%; animation: spin 0.6s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── Custom date row ─────────────────────────────────────────────── */
     .date-row { display: flex; gap: 8px; }
     .date-row > div { flex: 1; }
-
-    /* ── Divider ──────────────────────────────────────────────────────── */
     .divider { border-top: 1px solid #e0e0e0; margin: 16px 0; }
+
+    /* ── Auth code input (TikTok) ─────────────────────────────────────── */
+    .auth-code-row { display: flex; gap: 6px; margin-top: 6px; }
+    .auth-code-row input { flex: 1; margin-bottom: 0; }
+    .auth-code-row .btn { width: auto; margin-top: 0; flex-shrink: 0; }
   </style>
 </head>
 <body>
 
-<!-- ══════════════════════════════════════════════════════════════════════
-     STEPPER INDICATOR
-     ══════════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════ PLATFORM TABS ═══════════════════════════════════════ -->
+<div class="platform-tabs" id="platformTabs">
+  <button class="platform-tab active" data-platform="meta" onclick="switchPlatform('meta')">Meta Ads</button>
+  <button class="platform-tab" data-platform="tiktok" onclick="switchPlatform('tiktok')">TikTok Ads</button>
+  <button class="platform-tab disabled" data-platform="snap">Snapchat<span class="coming-soon">soon</span></button>
+  <button class="platform-tab disabled" data-platform="reddit">Reddit<span class="coming-soon">soon</span></button>
+  <button class="platform-tab disabled" data-platform="pinterest">Pinterest<span class="coming-soon">soon</span></button>
+</div>
+
+<div class="content">
+
+<!-- Global status bar -->
+<div class="status-bar" id="globalStatus"></div>
+
+<!-- Stepper -->
 <div class="stepper" id="stepper">
   <div class="stepper-dot active" data-step="1"></div>
   <div class="stepper-dot" data-step="2"></div>
@@ -167,46 +190,73 @@
   <div class="stepper-dot" data-step="5"></div>
 </div>
 
-<!-- Global status bar -->
-<div class="status-bar" id="globalStatus"></div>
 
-<!-- ══════════════════════════════════════════════════════════════════════
-     STEP 1 — AUTHENTICATION
-     ══════════════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════════════
+     STEP 1 — AUTHENTICATION (shared layout, platform-specific content)
+     ═══════════════════════════════════════════════════════════════════════ -->
 <div class="step active" id="step1">
   <div class="step-header">
     <div class="step-num">1</div>
-    <h2>Connect to Meta</h2>
+    <h2 id="authTitle">Connect to Meta</h2>
   </div>
 
-  <!-- Credentials setup -->
-  <div class="cred-section" id="credSection">
-    <p class="helper-text">
-      Create a Meta App at
-      <a href="https://developers.facebook.com/apps" target="_blank">developers.facebook.com</a>,
-      then paste your App ID and Secret below.
-    </p>
-    <div id="redirectUriBox" style="display:none; margin-bottom:8px;">
-      <label>OAuth Redirect URI (add this to your Meta App)</label>
-      <input type="text" id="redirectUri" readonly style="background:#fff8e1; font-size:11px;">
+  <!-- ── META credentials ── -->
+  <div class="platform-section meta-only" id="metaCredSection">
+    <div class="cred-section" id="metaCredForm">
+      <p class="helper-text">
+        Create a Meta App at
+        <a href="https://developers.facebook.com/apps" target="_blank">developers.facebook.com</a>,
+        then paste your App ID and Secret below.
+      </p>
+      <div id="metaRedirectUriBox" style="display:none; margin-bottom:8px;">
+        <label>OAuth Redirect URI (add to your Meta App)</label>
+        <input type="text" id="metaRedirectUri" readonly style="background:#fff8e1; font-size:11px;">
+      </div>
+      <label>App ID</label>
+      <input type="text" id="metaClientId" placeholder="e.g. 1234567890">
+      <label>App Secret</label>
+      <input type="password" id="metaClientSecret" placeholder="e.g. abc123def456...">
+      <button class="btn btn-secondary" onclick="saveMetaCreds()">Save Credentials</button>
     </div>
-    <label>App ID</label>
-    <input type="text" id="clientId" placeholder="e.g. 1234567890">
-    <label>App Secret</label>
-    <input type="password" id="clientSecret" placeholder="e.g. abc123def456...">
-    <button class="btn btn-secondary" onclick="saveCredentials()">Save Credentials</button>
   </div>
 
-  <!-- Auth status -->
+  <!-- ── TIKTOK credentials ── -->
+  <div class="platform-section tiktok-only" id="tiktokCredSection" style="display:none;">
+    <div class="cred-section" id="tiktokCredForm">
+      <p class="helper-text">
+        Create a TikTok App at
+        <a href="https://business-api.tiktok.com/portal" target="_blank">TikTok Business API Portal</a>,
+        then paste your App ID and Secret below.
+      </p>
+      <label>App ID</label>
+      <input type="text" id="tiktokAppId" placeholder="e.g. 7012345678901234567">
+      <label>App Secret</label>
+      <input type="password" id="tiktokAppSecret" placeholder="e.g. abc123...">
+      <button class="btn btn-secondary" onclick="saveTikTokCreds()">Save Credentials</button>
+    </div>
+
+    <!-- TikTok auth code exchange (since redirect may not work in add-on) -->
+    <div id="tiktokAuthCodeSection" style="display:none; margin-top:8px;">
+      <p class="helper-text">
+        After authorizing, copy the <strong>auth_code</strong> from the redirect URL and paste it here.
+      </p>
+      <div class="auth-code-row">
+        <input type="text" id="tiktokAuthCode" placeholder="Paste auth_code here">
+        <button class="btn btn-primary btn-small" onclick="exchangeTikTokCode()">Connect</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth status (shared) -->
   <div id="authStatusArea">
     <div id="authBadge" class="auth-badge disconnected" style="margin-bottom:12px;">
       <span class="dot red" id="authDot"></span>
       <span id="authLabel">Checking...</span>
     </div>
-    <button class="btn btn-primary" id="btnConnect" style="display:none;" onclick="connectMeta()">
-      Connect Meta Account
+    <button class="btn btn-primary" id="btnConnect" style="display:none;">
+      Connect Account
     </button>
-    <button class="btn btn-danger btn-small" id="btnDisconnect" style="display:none;" onclick="disconnectMeta()">
+    <button class="btn btn-danger btn-small" id="btnDisconnect" style="display:none;" onclick="handleDisconnect()">
       Disconnect
     </button>
   </div>
@@ -218,16 +268,17 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════
+
+<!-- ═══════════════════════════════════════════════════════════════════════
      STEP 2 — ACCOUNT SELECTION
-     ══════════════════════════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 <div class="step" id="step2">
   <div class="step-header">
     <div class="step-num">2</div>
-    <h2>Select Ad Account</h2>
+    <h2 id="acctTitle">Select Ad Account</h2>
   </div>
 
-  <label>Ad Account</label>
+  <label id="acctLabel">Ad Account</label>
   <select id="accountSelect">
     <option value="">Loading accounts...</option>
   </select>
@@ -240,9 +291,10 @@
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════
+
+<!-- ═══════════════════════════════════════════════════════════════════════
      STEP 3 — REPORT CONFIGURATION
-     ══════════════════════════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 <div class="step" id="step3">
   <div class="step-header">
     <div class="step-num">3</div>
@@ -253,9 +305,11 @@
   <label>Reporting Level</label>
   <select id="levelSelect"></select>
 
-  <!-- Date range -->
-  <label>Date Range</label>
-  <select id="datePresetSelect" onchange="toggleCustomDates()"></select>
+  <!-- Date range — Meta uses presets, TikTok uses custom dates -->
+  <div id="datePresetRow">
+    <label>Date Range</label>
+    <select id="datePresetSelect" onchange="toggleCustomDates()"></select>
+  </div>
   <div class="date-row" id="customDates" style="display:none;">
     <div>
       <label>Start Date</label>
@@ -267,41 +321,43 @@
     </div>
   </div>
 
-  <!-- Time Increment -->
-  <label>Time Increment</label>
-  <select id="timeIncrementSelect"></select>
+  <!-- Time Increment (Meta only) -->
+  <div id="timeIncrementRow">
+    <label>Time Increment</label>
+    <select id="timeIncrementSelect"></select>
+  </div>
 
-  <!-- Breakdowns -->
-  <h3>Breakdowns (optional)</h3>
+  <!-- Breakdowns / Dimensions -->
+  <h3 id="breakdownsLabel">Breakdowns (optional)</h3>
   <div class="chip-group" id="breakdownChips"></div>
 
   <!-- Metrics -->
   <h3>Metrics</h3>
   <div style="margin-bottom:6px;">
-    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('essential')" style="display:inline-flex; width:auto;">Essential</button>
-    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('performance')" style="display:inline-flex; width:auto;">Performance</button>
-    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('all')" style="display:inline-flex; width:auto;">All</button>
-    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('none')" style="display:inline-flex; width:auto;">Clear</button>
+    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('essential')" style="display:inline-flex;width:auto;">Essential</button>
+    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('performance')" style="display:inline-flex;width:auto;">Performance</button>
+    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('all')" style="display:inline-flex;width:auto;">All</button>
+    <button class="btn btn-secondary btn-small" onclick="selectPresetMetrics('none')" style="display:inline-flex;width:auto;">Clear</button>
   </div>
   <div class="metric-picker" id="metricChips"></div>
   <div style="font-size:11px; color:#80868b;" id="metricCount">0 metrics selected</div>
 
   <div class="nav-row">
     <button class="btn btn-secondary" onclick="goToStep(2)">Back</button>
-    <button class="btn btn-primary" id="btnNext3" onclick="goToStep(4)">Next: Run</button>
+    <button class="btn btn-primary" onclick="goToStep(4)">Next: Run</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════
+
+<!-- ═══════════════════════════════════════════════════════════════════════
      STEP 4 — RUN REPORT
-     ══════════════════════════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 <div class="step" id="step4">
   <div class="step-header">
     <div class="step-num">4</div>
     <h2>Run Report</h2>
   </div>
 
-  <!-- Summary -->
   <div style="background:#f8f9fa; padding:12px; border-radius:6px; margin-bottom:12px; font-size:12px;" id="reportSummary"></div>
 
   <button class="btn btn-primary" id="btnRun" onclick="executeReport()">
@@ -315,18 +371,17 @@
 
   <div class="divider"></div>
 
-  <button class="btn btn-secondary" onclick="goToStep(5)">
-    Schedule this Report
-  </button>
+  <button class="btn btn-secondary" onclick="goToStep(5)">Schedule this Report</button>
 
   <div class="nav-row">
     <button class="btn btn-secondary" onclick="goToStep(3)">Back</button>
   </div>
 </div>
 
-<!-- ══════════════════════════════════════════════════════════════════════
+
+<!-- ═══════════════════════════════════════════════════════════════════════
      STEP 5 — SCHEDULING
-     ══════════════════════════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 <div class="step" id="step5">
   <div class="step-header">
     <div class="step-num">5</div>
@@ -334,8 +389,8 @@
   </div>
 
   <p class="helper-text">
-    Reports run in two steps: Step A requests the report from Meta,
-    and Step B (1 hour later) imports the results into your sheet.
+    Reports run in two steps: Step A requests the report,
+    Step B (1 hour later) imports results into your sheet.
   </p>
 
   <label>Frequency</label>
@@ -348,16 +403,12 @@
   <div id="weeklyOptions" style="display:none;">
     <label>Day of Week</label>
     <select id="schedDayOfWeek">
-      <option value="1">Monday</option>
-      <option value="2">Tuesday</option>
-      <option value="3">Wednesday</option>
-      <option value="4">Thursday</option>
-      <option value="5">Friday</option>
-      <option value="6">Saturday</option>
+      <option value="1">Monday</option><option value="2">Tuesday</option>
+      <option value="3">Wednesday</option><option value="4">Thursday</option>
+      <option value="5">Friday</option><option value="6">Saturday</option>
       <option value="7">Sunday</option>
     </select>
   </div>
-
   <div id="monthlyOptions" style="display:none;">
     <label>Day of Month</label>
     <select id="schedDayOfMonth"></select>
@@ -366,91 +417,153 @@
   <label>Time (Hour)</label>
   <select id="schedHour"></select>
 
-  <button class="btn btn-primary" id="btnSchedule" onclick="createSchedule()">
-    Create Schedule
-  </button>
+  <button class="btn btn-primary" id="btnSchedule" onclick="createSchedule()">Create Schedule</button>
 
   <div class="divider"></div>
-
   <h3>Active Schedules</h3>
-  <div id="scheduleList"><em>Loading...</em></div>
+  <div id="scheduleList"><em style="color:#80868b;">Loading...</em></div>
 
   <div class="nav-row">
     <button class="btn btn-secondary" onclick="goToStep(4)">Back</button>
   </div>
 </div>
 
+</div><!-- /content -->
 
-<!-- ══════════════════════════════════════════════════════════════════════
+
+<!-- ═══════════════════════════════════════════════════════════════════════
      JAVASCRIPT
-     ══════════════════════════════════════════════════════════════════════ -->
+     ═══════════════════════════════════════════════════════════════════════ -->
 <script>
-  // ── State ───────────────────────────────────────────────────────────
-  var currentStep = 1;
-  var adAccounts  = [];
+  // ── Platform config ────────────────────────────────────────────────
+  var PLATFORMS = {
+    meta: {
+      accent: '#1877F2',
+      authTitle: 'Connect to Meta',
+      acctTitle: 'Select Ad Account',
+      acctLabel: 'Ad Account',
+      breakdownsLabel: 'Breakdowns (optional)',
+      useDatePresets: true,
+      useTimeIncrement: true,
+      essentialMetrics: [
+        'account_name','campaign_name','date_start','date_stop',
+        'impressions','reach','spend','clicks','ctr','cpc','cpm'
+      ],
+      performanceMetrics: [
+        'account_name','campaign_name','date_start','date_stop',
+        'impressions','reach','spend','clicks','ctr','cpc','cpm',
+        'inline_link_clicks','inline_link_click_ctr','frequency',
+        'post_engagement','landing_page_view','link_click',
+        'offsite_conversion.fb_pixel_purchase',
+        'offsite_conversion.fb_pixel_purchase:value','purchase_roas'
+      ]
+    },
+    tiktok: {
+      accent: '#000000',
+      authTitle: 'Connect to TikTok',
+      acctTitle: 'Select Advertiser',
+      acctLabel: 'Advertiser Account',
+      breakdownsLabel: 'Dimensions',
+      useDatePresets: false,
+      useTimeIncrement: false,
+      essentialMetrics: [
+        'campaign_name','impressions','reach','spend','clicks','ctr','cpc','cpm'
+      ],
+      performanceMetrics: [
+        'campaign_name','impressions','reach','spend','clicks','ctr','cpc','cpm',
+        'frequency','video_play_actions','video_watched_6s',
+        'likes','comments','shares','follows',
+        'conversion','cost_per_conversion','conversion_rate',
+        'complete_payment'
+      ]
+    }
+  };
+
+  // ── State ──────────────────────────────────────────────────────────
+  var activePlatform  = 'meta';
+  var currentStep     = 1;
+  var adAccounts      = [];
   var metricsCatalog  = [];
   var breakdownsCatalog = [];
   var selectedMetrics    = [];
   var selectedBreakdowns = [];
 
-  var ESSENTIAL_METRICS = [
-    'account_name','campaign_name','date_start','date_stop',
-    'impressions','reach','spend','clicks','ctr','cpc','cpm'
-  ];
-  var PERFORMANCE_METRICS = ESSENTIAL_METRICS.concat([
-    'inline_link_clicks','inline_link_click_ctr','frequency',
-    'post_engagement','landing_page_view','link_click',
-    'offsite_conversion.fb_pixel_purchase',
-    'offsite_conversion.fb_pixel_purchase:value','purchase_roas'
-  ]);
-
-  // ── Initialization ──────────────────────────────────────────────────
+  // ── Init ───────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
-    checkAuth();
-    loadRedirectUri();
-    loadCatalogs();
+    switchPlatform('meta');
     populateScheduleDropdowns();
   });
 
+  // ── Platform switching ─────────────────────────────────────────────
+  function switchPlatform(platform) {
+    activePlatform = platform;
+    var cfg = PLATFORMS[platform];
+
+    // CSS accent color
+    document.documentElement.style.setProperty('--accent', cfg.accent);
+
+    // Tab highlight
+    document.querySelectorAll('.platform-tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.platform === platform);
+    });
+
+    // Reset state
+    currentStep = 1;
+    adAccounts = [];
+    metricsCatalog = [];
+    breakdownsCatalog = [];
+    selectedMetrics = [];
+    selectedBreakdowns = [];
+
+    // Show correct step
+    document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById('step1').classList.add('active');
+    updateStepper();
+
+    // Labels
+    document.getElementById('authTitle').textContent = cfg.authTitle;
+    document.getElementById('acctTitle').textContent = cfg.acctTitle;
+    document.getElementById('acctLabel').textContent = cfg.acctLabel;
+    document.getElementById('breakdownsLabel').textContent = cfg.breakdownsLabel;
+
+    // Show/hide platform-specific sections
+    togglePlatformSections(platform);
+
+    // Date config
+    document.getElementById('datePresetRow').style.display = cfg.useDatePresets ? 'block' : 'none';
+    document.getElementById('customDates').style.display = cfg.useDatePresets ? 'none' : 'flex';
+    document.getElementById('timeIncrementRow').style.display = cfg.useTimeIncrement ? 'block' : 'none';
+
+    // Set default dates for non-preset platforms
+    if (!cfg.useDatePresets) {
+      var today = new Date();
+      var thirtyAgo = new Date(today); thirtyAgo.setDate(today.getDate() - 30);
+      document.getElementById('dateUntil').value = formatDateInput(today);
+      document.getElementById('dateSince').value = formatDateInput(thirtyAgo);
+    }
+
+    // Load auth and catalogs
+    checkAuth();
+    loadCatalogs();
+  }
+
+  function togglePlatformSections(platform) {
+    // Meta sections
+    var metaSections = document.querySelectorAll('.meta-only');
+    metaSections.forEach(function(el) { el.style.display = platform === 'meta' ? 'block' : 'none'; });
+    // TikTok sections
+    var tiktokSections = document.querySelectorAll('.tiktok-only');
+    tiktokSections.forEach(function(el) { el.style.display = platform === 'tiktok' ? 'block' : 'none'; });
+  }
+
+  // ── Auth ───────────────────────────────────────────────────────────
   function checkAuth() {
+    var fn = activePlatform === 'meta' ? 'getAuthStatus' : 'getTikTokAuthStatus';
     google.script.run.withSuccessHandler(function(json) {
-      var auth = JSON.parse(json);
-      updateAuthUI(auth);
-    }).withFailureHandler(showError).getAuthStatus();
+      updateAuthUI(JSON.parse(json));
+    }).withFailureHandler(showError)[fn]();
   }
 
-  function loadRedirectUri() {
-    google.script.run.withSuccessHandler(function(uri) {
-      document.getElementById('redirectUri').value = uri;
-      document.getElementById('redirectUriBox').style.display = 'block';
-    }).getRedirectUri();
-  }
-
-  function loadCatalogs() {
-    google.script.run.withSuccessHandler(function(json) {
-      metricsCatalog = JSON.parse(json);
-      renderMetricChips();
-    }).getMetricsCatalog();
-
-    google.script.run.withSuccessHandler(function(json) {
-      breakdownsCatalog = JSON.parse(json);
-      renderBreakdownChips();
-    }).getBreakdownsCatalog();
-
-    google.script.run.withSuccessHandler(function(json) {
-      populateSelect('datePresetSelect', JSON.parse(json), 'last_30d');
-    }).getDatePresets();
-
-    google.script.run.withSuccessHandler(function(json) {
-      populateSelect('timeIncrementSelect', JSON.parse(json), '1');
-    }).getTimeIncrements();
-
-    google.script.run.withSuccessHandler(function(json) {
-      populateSelect('levelSelect', JSON.parse(json), 'campaign');
-    }).getReportingLevels();
-  }
-
-  // ── Auth UI ─────────────────────────────────────────────────────────
   function updateAuthUI(auth) {
     var badge = document.getElementById('authBadge');
     var dot   = document.getElementById('authDot');
@@ -458,61 +571,113 @@
     var btnConnect    = document.getElementById('btnConnect');
     var btnDisconnect = document.getElementById('btnDisconnect');
     var btnNext       = document.getElementById('btnNext1');
-    var credSection   = document.getElementById('credSection');
+
+    // Hide cred forms when connected
+    var metaCredForm   = document.getElementById('metaCredForm');
+    var tiktokCredForm = document.getElementById('tiktokCredForm');
+    var tiktokAuthCode = document.getElementById('tiktokAuthCodeSection');
 
     if (auth.status === 'connected') {
       badge.className = 'auth-badge connected';
       dot.className   = 'dot green';
-      label.textContent = 'Connected to Meta';
+      label.textContent = auth.message;
       btnConnect.style.display    = 'none';
       btnDisconnect.style.display = 'inline-flex';
       btnNext.disabled = false;
-      credSection.style.display = 'none';
+      if (activePlatform === 'meta') metaCredForm.style.display = 'none';
+      if (activePlatform === 'tiktok') { tiktokCredForm.style.display = 'none'; tiktokAuthCode.style.display = 'none'; }
+
     } else if (auth.status === 'disconnected') {
       badge.className = 'auth-badge disconnected';
       dot.className   = 'dot red';
       label.textContent = 'Not connected';
       btnConnect.style.display    = 'inline-flex';
+      btnConnect.textContent      = 'Connect ' + (activePlatform === 'meta' ? 'Meta' : 'TikTok');
       btnConnect.onclick = function() { window.open(auth.authUrl); };
       btnDisconnect.style.display = 'none';
       btnNext.disabled = true;
-      credSection.style.display = 'none';
-    } else {
+      if (activePlatform === 'meta') metaCredForm.style.display = 'none';
+      if (activePlatform === 'tiktok') { tiktokCredForm.style.display = 'none'; tiktokAuthCode.style.display = 'block'; }
+
+    } else { // no_credentials
       badge.className = 'auth-badge disconnected';
       dot.className   = 'dot red';
       label.textContent = auth.message;
       btnConnect.style.display    = 'none';
       btnDisconnect.style.display = 'none';
       btnNext.disabled = true;
-      credSection.style.display = 'block';
+      if (activePlatform === 'meta') metaCredForm.style.display = 'block';
+      if (activePlatform === 'tiktok') { tiktokCredForm.style.display = 'block'; tiktokAuthCode.style.display = 'none'; }
     }
   }
 
-  function saveCredentials() {
-    var clientId     = document.getElementById('clientId').value;
-    var clientSecret = document.getElementById('clientSecret').value;
-    if (!clientId || !clientSecret) { showStatus('Please enter both App ID and App Secret.', 'error'); return; }
-
+  function saveMetaCreds() {
+    var id = document.getElementById('metaClientId').value;
+    var secret = document.getElementById('metaClientSecret').value;
+    if (!id || !secret) { showStatus('Enter both App ID and Secret.', 'error'); return; }
     google.script.run.withSuccessHandler(function(json) {
-      var auth = JSON.parse(json);
-      updateAuthUI(auth);
-      showStatus('Credentials saved.', 'success');
-    }).withFailureHandler(showError).saveMetaCredentials(clientId, clientSecret);
+      updateAuthUI(JSON.parse(json));
+      showStatus('Meta credentials saved.', 'success');
+      loadMetaRedirectUri();
+    }).withFailureHandler(showError).saveMetaCredentials(id, secret);
   }
 
-  function connectMeta() {
-    checkAuth();
-  }
-
-  function disconnectMeta() {
+  function saveTikTokCreds() {
+    var id = document.getElementById('tiktokAppId').value;
+    var secret = document.getElementById('tiktokAppSecret').value;
+    if (!id || !secret) { showStatus('Enter both App ID and Secret.', 'error'); return; }
     google.script.run.withSuccessHandler(function(json) {
-      var auth = JSON.parse(json);
-      updateAuthUI(auth);
-      showStatus('Disconnected from Meta.', 'info');
-    }).withFailureHandler(showError).disconnectMeta();
+      updateAuthUI(JSON.parse(json));
+      showStatus('TikTok credentials saved.', 'success');
+    }).withFailureHandler(showError).saveTikTokCredentials(id, secret);
   }
 
-  // ── Step navigation ─────────────────────────────────────────────────
+  function exchangeTikTokCode() {
+    var code = document.getElementById('tiktokAuthCode').value;
+    if (!code) { showStatus('Please paste the auth_code.', 'error'); return; }
+    google.script.run.withSuccessHandler(function(json) {
+      var result = JSON.parse(json);
+      if (result.success) {
+        showStatus(result.message, 'success');
+        checkAuth();
+      } else {
+        showStatus(result.message, 'error');
+      }
+    }).withFailureHandler(showError).exchangeTikTokAuthCode(code);
+  }
+
+  function handleDisconnect() {
+    var fn = activePlatform === 'meta' ? 'disconnectMeta' : 'disconnectTikTok';
+    google.script.run.withSuccessHandler(function(json) {
+      updateAuthUI(JSON.parse(json));
+      showStatus('Disconnected.', 'info');
+    }).withFailureHandler(showError)[fn]();
+  }
+
+  function loadMetaRedirectUri() {
+    google.script.run.withSuccessHandler(function(uri) {
+      document.getElementById('metaRedirectUri').value = uri;
+      document.getElementById('metaRedirectUriBox').style.display = 'block';
+    }).getRedirectUri();
+  }
+
+  // ── Catalogs ───────────────────────────────────────────────────────
+  function loadCatalogs() {
+    if (activePlatform === 'meta') {
+      google.script.run.withSuccessHandler(function(j) { metricsCatalog = JSON.parse(j); renderMetricChips(); }).getMetricsCatalog();
+      google.script.run.withSuccessHandler(function(j) { breakdownsCatalog = JSON.parse(j); renderBreakdownChips(); }).getBreakdownsCatalog();
+      google.script.run.withSuccessHandler(function(j) { populateSelect('datePresetSelect', JSON.parse(j), 'last_30d'); }).getDatePresets();
+      google.script.run.withSuccessHandler(function(j) { populateSelect('timeIncrementSelect', JSON.parse(j), '1'); }).getTimeIncrements();
+      google.script.run.withSuccessHandler(function(j) { populateSelect('levelSelect', JSON.parse(j), 'campaign'); }).getReportingLevels();
+      loadMetaRedirectUri();
+    } else if (activePlatform === 'tiktok') {
+      google.script.run.withSuccessHandler(function(j) { metricsCatalog = JSON.parse(j); renderMetricChips(); }).getTikTokMetricsCatalog();
+      google.script.run.withSuccessHandler(function(j) { breakdownsCatalog = JSON.parse(j); renderBreakdownChips(); }).getTikTokDimensions();
+      google.script.run.withSuccessHandler(function(j) { populateSelect('levelSelect', JSON.parse(j), 'AUCTION_CAMPAIGN'); }).getTikTokDataLevels();
+    }
+  }
+
+  // ── Step navigation ────────────────────────────────────────────────
   function goToStep(step) {
     document.getElementById('step' + currentStep).classList.remove('active');
     document.getElementById('step' + step).classList.add('active');
@@ -533,39 +698,50 @@
     });
   }
 
-  // ── Account loading ─────────────────────────────────────────────────
+  // ── Account loading ────────────────────────────────────────────────
   function loadAccounts() {
     var sel = document.getElementById('accountSelect');
     sel.innerHTML = '<option value="">Loading accounts...</option>';
+    document.getElementById('btnNext2').disabled = true;
 
-    google.script.run.withSuccessHandler(function(json) {
-      adAccounts = JSON.parse(json);
-      sel.innerHTML = '<option value="">-- Select an account --</option>';
-      adAccounts.forEach(function(acct) {
-        var opt = document.createElement('option');
-        opt.value = acct.id;
-        opt.textContent = acct.name + ' (' + acct.account_id + ')';
-        sel.appendChild(opt);
-      });
+    if (activePlatform === 'meta') {
+      google.script.run.withSuccessHandler(function(json) {
+        adAccounts = JSON.parse(json);
+        sel.innerHTML = '<option value="">-- Select an account --</option>';
+        adAccounts.forEach(function(a) {
+          var opt = document.createElement('option');
+          opt.value = a.id;
+          opt.textContent = a.name + ' (' + a.account_id + ')';
+          sel.appendChild(opt);
+        });
+        sel.onchange = function() {
+          document.getElementById('btnNext2').disabled = !sel.value;
+          var acct = adAccounts.find(function(a) { return a.id === sel.value; });
+          var info = document.getElementById('accountInfo');
+          if (acct) { info.style.display = 'block'; info.textContent = 'Currency: ' + acct.currency + ' | TZ: ' + acct.timezone_name; }
+          else { info.style.display = 'none'; }
+        };
+      }).withFailureHandler(function(e) { sel.innerHTML = '<option>Error loading</option>'; showError(e); }).fetchAdAccounts();
 
-      sel.onchange = function() {
-        var selected = adAccounts.find(function(a) { return a.id === sel.value; });
-        document.getElementById('btnNext2').disabled = !sel.value;
-        var info = document.getElementById('accountInfo');
-        if (selected) {
-          info.style.display = 'block';
-          info.textContent = 'Currency: ' + selected.currency + ' | Timezone: ' + selected.timezone_name;
-        } else {
-          info.style.display = 'none';
-        }
-      };
-    }).withFailureHandler(function(err) {
-      sel.innerHTML = '<option value="">Error loading accounts</option>';
-      showError(err);
-    }).fetchAdAccounts();
+    } else if (activePlatform === 'tiktok') {
+      google.script.run.withSuccessHandler(function(json) {
+        adAccounts = JSON.parse(json);
+        sel.innerHTML = '<option value="">-- Select an advertiser --</option>';
+        adAccounts.forEach(function(a) {
+          var opt = document.createElement('option');
+          opt.value = a.advertiser_id;
+          opt.textContent = a.advertiser_name + ' (' + a.advertiser_id + ')';
+          sel.appendChild(opt);
+        });
+        sel.onchange = function() {
+          document.getElementById('btnNext2').disabled = !sel.value;
+          document.getElementById('accountInfo').style.display = 'none';
+        };
+      }).withFailureHandler(function(e) { sel.innerHTML = '<option>Error loading</option>'; showError(e); }).fetchTikTokAdvertisers();
+    }
   }
 
-  // ── Metric / Breakdown chips ────────────────────────────────────────
+  // ── Metric / Breakdown chips ───────────────────────────────────────
   function renderMetricChips() {
     var container = document.getElementById('metricChips');
     container.innerHTML = '';
@@ -574,18 +750,14 @@
       if (!categories[m.category]) categories[m.category] = [];
       categories[m.category].push(m);
     });
-
     Object.keys(categories).forEach(function(cat) {
       var catDiv = document.createElement('div');
       catDiv.className = 'chip-category';
       catDiv.innerHTML = '<div class="chip-category-label">' + cat + '</div><div class="chips"></div>';
       var chipsDiv = catDiv.querySelector('.chips');
-
       categories[cat].forEach(function(m) {
         var chip = document.createElement('span');
-        chip.className = 'chip';
-        chip.textContent = m.label;
-        chip.dataset.value = m.value;
+        chip.className = 'chip'; chip.textContent = m.label; chip.dataset.value = m.value;
         chip.onclick = function() { toggleMetric(m.value, chip); };
         chipsDiv.appendChild(chip);
       });
@@ -596,253 +768,229 @@
   function renderBreakdownChips() {
     var container = document.getElementById('breakdownChips');
     container.innerHTML = '';
+    var categories = {};
     breakdownsCatalog.forEach(function(b) {
-      var chip = document.createElement('span');
-      chip.className = 'chip';
-      chip.textContent = b.label;
-      chip.dataset.value = b.value;
-      chip.onclick = function() { toggleBreakdown(b.value, chip); };
-      container.appendChild(chip);
+      if (!categories[b.category]) categories[b.category] = [];
+      categories[b.category].push(b);
+    });
+    Object.keys(categories).forEach(function(cat) {
+      var catDiv = document.createElement('div');
+      catDiv.className = 'chip-category';
+      catDiv.innerHTML = '<div class="chip-category-label">' + cat + '</div><div class="chips"></div>';
+      var chipsDiv = catDiv.querySelector('.chips');
+      categories[cat].forEach(function(b) {
+        var chip = document.createElement('span');
+        chip.className = 'chip'; chip.textContent = b.label; chip.dataset.value = b.value;
+        // Auto-selected dimensions
+        if (b.auto) { chip.classList.add('selected'); selectedBreakdowns.push(b.value); }
+        chip.onclick = function() { toggleBreakdown(b.value, chip); };
+        chipsDiv.appendChild(chip);
+      });
+      container.appendChild(catDiv);
     });
   }
 
   function toggleMetric(value, chipEl) {
     var idx = selectedMetrics.indexOf(value);
-    if (idx > -1) {
-      selectedMetrics.splice(idx, 1);
-      chipEl.classList.remove('selected');
-    } else {
-      selectedMetrics.push(value);
-      chipEl.classList.add('selected');
-    }
+    if (idx > -1) { selectedMetrics.splice(idx, 1); chipEl.classList.remove('selected'); }
+    else { selectedMetrics.push(value); chipEl.classList.add('selected'); }
     document.getElementById('metricCount').textContent = selectedMetrics.length + ' metrics selected';
   }
 
   function toggleBreakdown(value, chipEl) {
     var idx = selectedBreakdowns.indexOf(value);
-    if (idx > -1) {
-      selectedBreakdowns.splice(idx, 1);
-      chipEl.classList.remove('selected');
-    } else {
-      selectedBreakdowns.push(value);
-      chipEl.classList.add('selected');
-    }
+    if (idx > -1) { selectedBreakdowns.splice(idx, 1); chipEl.classList.remove('selected'); }
+    else { selectedBreakdowns.push(value); chipEl.classList.add('selected'); }
   }
 
   function selectPresetMetrics(preset) {
+    var cfg = PLATFORMS[activePlatform];
     var targets = [];
-    if (preset === 'essential') targets = ESSENTIAL_METRICS;
-    else if (preset === 'performance') targets = PERFORMANCE_METRICS;
+    if (preset === 'essential') targets = cfg.essentialMetrics;
+    else if (preset === 'performance') targets = cfg.performanceMetrics;
     else if (preset === 'all') targets = metricsCatalog.map(function(m) { return m.value; });
-    else targets = [];
 
     selectedMetrics = targets.slice();
     document.querySelectorAll('#metricChips .chip').forEach(function(chip) {
-      if (targets.indexOf(chip.dataset.value) > -1) {
-        chip.classList.add('selected');
-      } else {
-        chip.classList.remove('selected');
-      }
+      chip.classList.toggle('selected', targets.indexOf(chip.dataset.value) > -1);
     });
     document.getElementById('metricCount').textContent = selectedMetrics.length + ' metrics selected';
   }
 
-  // ── Date range toggle ───────────────────────────────────────────────
+  // ── Date toggle ────────────────────────────────────────────────────
   function toggleCustomDates() {
-    var preset = document.getElementById('datePresetSelect').value;
-    document.getElementById('customDates').style.display = preset === 'custom' ? 'flex' : 'none';
+    var v = document.getElementById('datePresetSelect').value;
+    document.getElementById('customDates').style.display = v === 'custom' ? 'flex' : 'none';
   }
 
-  // ── Report summary ──────────────────────────────────────────────────
+  // ── Summary ────────────────────────────────────────────────────────
   function buildSummary() {
     var sel = document.getElementById('accountSelect');
     var acctName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : 'N/A';
-    var level = document.getElementById('levelSelect').value;
-    var datePreset = document.getElementById('datePresetSelect');
-    var dateTxt = datePreset.options[datePreset.selectedIndex].textContent;
+    var level = document.getElementById('levelSelect');
+    var levelTxt = level.options[level.selectedIndex] ? level.options[level.selectedIndex].textContent : '';
 
-    if (datePreset.value === 'custom') {
+    var dateTxt = '';
+    if (PLATFORMS[activePlatform].useDatePresets) {
+      var dp = document.getElementById('datePresetSelect');
+      dateTxt = dp.value === 'custom'
+        ? document.getElementById('dateSince').value + ' to ' + document.getElementById('dateUntil').value
+        : dp.options[dp.selectedIndex].textContent;
+    } else {
       dateTxt = document.getElementById('dateSince').value + ' to ' + document.getElementById('dateUntil').value;
     }
 
-    var html = '<strong>Account:</strong> ' + acctName + '<br>'
-      + '<strong>Level:</strong> ' + level + '<br>'
+    var html = '<strong>Platform:</strong> ' + activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1) + '<br>'
+      + '<strong>Account:</strong> ' + acctName + '<br>'
+      + '<strong>Level:</strong> ' + levelTxt + '<br>'
       + '<strong>Period:</strong> ' + dateTxt + '<br>'
-      + '<strong>Metrics:</strong> ' + selectedMetrics.length + ' selected<br>';
+      + '<strong>Metrics:</strong> ' + selectedMetrics.length + ' selected';
 
     if (selectedBreakdowns.length > 0) {
-      html += '<strong>Breakdowns:</strong> ' + selectedBreakdowns.join(', ');
+      html += '<br><strong>' + PLATFORMS[activePlatform].breakdownsLabel + ':</strong> ' + selectedBreakdowns.length + ' selected';
     }
-
     document.getElementById('reportSummary').innerHTML = html;
   }
 
-  // ── Execute report ──────────────────────────────────────────────────
+  // ── Execute report ─────────────────────────────────────────────────
   function executeReport() {
     var btn = document.getElementById('btnRun');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Running...';
     document.getElementById('progressBar').style.display = 'block';
     document.getElementById('progressFill').style.width = '30%';
-    document.getElementById('runStatus').textContent = 'Requesting data from Meta...';
+    document.getElementById('runStatus').textContent = 'Requesting data from ' + activePlatform + '...';
 
     var config = buildReportConfig();
+    var fn = activePlatform === 'meta' ? 'runReportFromSidebar' : 'runTikTokReportFromSidebar';
 
     google.script.run
       .withSuccessHandler(function(json) {
         var result = JSON.parse(json);
         document.getElementById('progressFill').style.width = '100%';
-        btn.disabled = false;
-        btn.innerHTML = 'Run Report Now';
-
-        if (result.success) {
-          document.getElementById('runStatus').textContent = '';
-          showStatus(result.message, 'success');
-        } else {
-          showStatus(result.message, 'error');
-        }
-        setTimeout(function() {
-          document.getElementById('progressBar').style.display = 'none';
-          document.getElementById('progressFill').style.width = '0%';
-        }, 2000);
+        btn.disabled = false; btn.innerHTML = 'Run Report Now';
+        if (result.success) { document.getElementById('runStatus').textContent = ''; showStatus(result.message, 'success'); }
+        else { showStatus(result.message, 'error'); }
+        setTimeout(function() { document.getElementById('progressBar').style.display = 'none'; document.getElementById('progressFill').style.width = '0%'; }, 2000);
       })
       .withFailureHandler(function(err) {
-        btn.disabled = false;
-        btn.innerHTML = 'Run Report Now';
+        btn.disabled = false; btn.innerHTML = 'Run Report Now';
         document.getElementById('progressBar').style.display = 'none';
         showError(err);
-      })
-      .runReportFromSidebar(JSON.stringify(config));
+      })[fn](JSON.stringify(config));
   }
 
   function buildReportConfig() {
     var sel = document.getElementById('accountSelect');
-    var acct = adAccounts.find(function(a) { return a.id === sel.value; });
-    var datePreset = document.getElementById('datePresetSelect').value;
 
-    return {
-      accountId:          sel.value,
-      accountName:        acct ? acct.name : 'Report',
-      level:              document.getElementById('levelSelect').value,
-      datePreset:         datePreset,
-      since:              datePreset === 'custom' ? document.getElementById('dateSince').value : null,
-      until:              datePreset === 'custom' ? document.getElementById('dateUntil').value : null,
-      timeIncrement:      document.getElementById('timeIncrementSelect').value,
-      selectedMetrics:    selectedMetrics,
-      selectedBreakdowns: selectedBreakdowns
-    };
+    if (activePlatform === 'meta') {
+      var acct = adAccounts.find(function(a) { return a.id === sel.value; });
+      var datePreset = document.getElementById('datePresetSelect').value;
+      return {
+        accountId:          sel.value,
+        accountName:        acct ? acct.name : 'Report',
+        level:              document.getElementById('levelSelect').value,
+        datePreset:         datePreset,
+        since:              datePreset === 'custom' ? document.getElementById('dateSince').value : null,
+        until:              datePreset === 'custom' ? document.getElementById('dateUntil').value : null,
+        timeIncrement:      document.getElementById('timeIncrementSelect').value,
+        selectedMetrics:    selectedMetrics,
+        selectedBreakdowns: selectedBreakdowns
+      };
+    } else if (activePlatform === 'tiktok') {
+      var acct2 = adAccounts.find(function(a) { return a.advertiser_id === sel.value; });
+      return {
+        advertiserId:       sel.value,
+        advertiserName:     acct2 ? acct2.advertiser_name : 'Report',
+        dataLevel:          document.getElementById('levelSelect').value,
+        startDate:          document.getElementById('dateSince').value,
+        endDate:            document.getElementById('dateUntil').value,
+        selectedMetrics:    selectedMetrics,
+        selectedDimensions: selectedBreakdowns
+      };
+    }
   }
 
-  // ── Scheduling ──────────────────────────────────────────────────────
+  // ── Scheduling ─────────────────────────────────────────────────────
   function populateScheduleDropdowns() {
-    // Day of month
     var domSel = document.getElementById('schedDayOfMonth');
-    for (var d = 1; d <= 28; d++) {
-      var opt = document.createElement('option');
-      opt.value = d; opt.textContent = d;
-      domSel.appendChild(opt);
-    }
-    // Hour
+    for (var d = 1; d <= 28; d++) { var o = document.createElement('option'); o.value = d; o.textContent = d; domSel.appendChild(o); }
     var hourSel = document.getElementById('schedHour');
-    for (var h = 0; h < 24; h++) {
-      var opt2 = document.createElement('option');
-      opt2.value = h;
-      opt2.textContent = (h % 12 || 12) + ':00 ' + (h >= 12 ? 'PM' : 'AM');
-      hourSel.appendChild(opt2);
-    }
-    // Default to 6 AM
+    for (var h = 0; h < 24; h++) { var o2 = document.createElement('option'); o2.value = h; o2.textContent = (h%12||12)+':00 '+(h>=12?'PM':'AM'); hourSel.appendChild(o2); }
     hourSel.value = '6';
   }
 
   function toggleScheduleOptions() {
-    var freq = document.getElementById('schedFrequency').value;
-    document.getElementById('weeklyOptions').style.display  = freq === 'weekly' ? 'block' : 'none';
-    document.getElementById('monthlyOptions').style.display = freq === 'monthly' ? 'block' : 'none';
+    var f = document.getElementById('schedFrequency').value;
+    document.getElementById('weeklyOptions').style.display  = f === 'weekly' ? 'block' : 'none';
+    document.getElementById('monthlyOptions').style.display = f === 'monthly' ? 'block' : 'none';
   }
 
   function createSchedule() {
     var btn = document.getElementById('btnSchedule');
     btn.disabled = true;
-
     var config = buildReportConfig();
+    config.platform = activePlatform;
     var scheduleConfig = {
-      uiConfig:    config,
-      frequency:   document.getElementById('schedFrequency').value,
-      hour:        parseInt(document.getElementById('schedHour').value),
-      dayOfWeek:   parseInt(document.getElementById('schedDayOfWeek').value) || 1,
-      dayOfMonth:  parseInt(document.getElementById('schedDayOfMonth').value) || 1
+      uiConfig: config, frequency: document.getElementById('schedFrequency').value,
+      hour: parseInt(document.getElementById('schedHour').value),
+      dayOfWeek: parseInt(document.getElementById('schedDayOfWeek').value) || 1,
+      dayOfMonth: parseInt(document.getElementById('schedDayOfMonth').value) || 1
     };
-
-    google.script.run
-      .withSuccessHandler(function(json) {
-        var result = JSON.parse(json);
-        btn.disabled = false;
-        if (result.success) {
-          showStatus(result.message, 'success');
-          loadSchedules();
-        } else {
-          showStatus(result.message, 'error');
-        }
-      })
-      .withFailureHandler(function(err) {
-        btn.disabled = false;
-        showError(err);
-      })
-      .createScheduledReport(scheduleConfig);
+    google.script.run.withSuccessHandler(function(json) {
+      var r = JSON.parse(json); btn.disabled = false;
+      showStatus(r.message, r.success ? 'success' : 'error');
+      if (r.success) loadSchedules();
+    }).withFailureHandler(function(e) { btn.disabled = false; showError(e); }).createScheduledReport(scheduleConfig);
   }
 
   function loadSchedules() {
     google.script.run.withSuccessHandler(function(json) {
       var list = JSON.parse(json);
-      var container = document.getElementById('scheduleList');
-      if (list.length === 0) {
-        container.innerHTML = '<em style="color:#80868b;">No scheduled reports.</em>';
-        return;
-      }
-      container.innerHTML = '';
+      var c = document.getElementById('scheduleList');
+      if (!list.length) { c.innerHTML = '<em style="color:#80868b;">No scheduled reports.</em>'; return; }
+      c.innerHTML = '';
       list.forEach(function(item) {
-        var div = document.createElement('div');
-        div.className = 'schedule-item';
+        var div = document.createElement('div'); div.className = 'schedule-item';
         div.innerHTML = '<div><strong>' + item.accountName + '</strong><br>'
           + '<span style="color:#5f6368;">' + item.frequency + ' at '
-          + ((item.hour % 12 || 12) + ':00 ' + (item.hour >= 12 ? 'PM' : 'AM'))
+          + ((item.hour%12||12)+':00 '+(item.hour>=12?'PM':'AM'))
           + '</span></div>'
-          + '<button class="btn btn-danger btn-small" onclick="deleteSchedule(\'' + item.id + '\')">Delete</button>';
-        container.appendChild(div);
+          + '<button class="btn btn-danger btn-small" onclick="deleteSchedule(\''+item.id+'\')">Delete</button>';
+        c.appendChild(div);
       });
     }).withFailureHandler(showError).listScheduledReports();
   }
 
-  function deleteSchedule(configId) {
+  function deleteSchedule(id) {
     google.script.run.withSuccessHandler(function(json) {
-      var result = JSON.parse(json);
-      showStatus(result.message, result.success ? 'success' : 'error');
+      var r = JSON.parse(json);
+      showStatus(r.message, r.success ? 'success' : 'error');
       loadSchedules();
-    }).withFailureHandler(showError).deleteScheduledReport(configId);
+    }).withFailureHandler(showError).deleteScheduledReport(id);
   }
 
-  // ── Utilities ───────────────────────────────────────────────────────
+  // ── Utilities ──────────────────────────────────────────────────────
   function populateSelect(selectId, items, defaultVal) {
-    var sel = document.getElementById(selectId);
-    sel.innerHTML = '';
+    var sel = document.getElementById(selectId); sel.innerHTML = '';
     items.forEach(function(item) {
-      var opt = document.createElement('option');
-      opt.value = item.value;
-      opt.textContent = item.label;
-      if (item.value === defaultVal) opt.selected = true;
-      sel.appendChild(opt);
+      var o = document.createElement('option'); o.value = item.value; o.textContent = item.label;
+      if (item.value === defaultVal) o.selected = true;
+      sel.appendChild(o);
     });
   }
 
   function showStatus(msg, type) {
     var bar = document.getElementById('globalStatus');
-    bar.textContent = msg;
-    bar.className = 'status-bar show ' + type;
+    bar.textContent = msg; bar.className = 'status-bar show ' + type;
     setTimeout(function() { bar.classList.remove('show'); }, 6000);
   }
 
-  function showError(err) {
-    showStatus(err.message || err, 'error');
+  function showError(err) { showStatus(err.message || err, 'error'); }
+
+  function formatDateInput(d) {
+    var m = d.getMonth() + 1; var day = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
   }
 </script>
 </body>
