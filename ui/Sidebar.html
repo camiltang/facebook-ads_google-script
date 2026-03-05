@@ -584,6 +584,34 @@
      JAVASCRIPT
      ═══════════════════════════════════════════════════════════════════════ -->
 <script>
+  // ══════════════════════════════════════════════════════════════════════
+  // DEMO MODE — Set to true to skip OAuth and use dummy accounts/data.
+  // This lets you preview the full UI/UX without connecting real accounts.
+  // ══════════════════════════════════════════════════════════════════════
+  var DEMO_MODE = false;
+
+  var DEMO_ACCOUNTS = {
+    meta:      [
+      { id: 'act_111111', name: 'Demo Brand US',    account_id: '111111', currency: 'USD', timezone_name: 'America/New_York' },
+      { id: 'act_222222', name: 'Demo Brand EU',    account_id: '222222', currency: 'EUR', timezone_name: 'Europe/London' },
+      { id: 'act_333333', name: 'Demo Brand APAC',  account_id: '333333', currency: 'AUD', timezone_name: 'Australia/Sydney' }
+    ],
+    tiktok:    [
+      { advertiser_id: '7001001001', advertiser_name: 'Demo TikTok Advertiser' },
+      { advertiser_id: '7001001002', advertiser_name: 'Demo TikTok Brand #2' }
+    ],
+    snapchat:  [
+      { id: 'snap-acct-001', name: 'Demo Snap Account' }
+    ],
+    reddit:    [
+      { id: 'reddit-acct-001', name: 'Demo Reddit Ads' },
+      { id: 'reddit-acct-002', name: 'Demo Reddit Brand' }
+    ],
+    pinterest: [
+      { id: 'pin-acct-001', name: 'Demo Pinterest Ads' }
+    ]
+  };
+
   // ── Platform config ────────────────────────────────────────────────
   var PLATFORMS = {
     meta: {
@@ -792,6 +820,10 @@
   };
 
   function checkAuth() {
+    if (DEMO_MODE) {
+      updateAuthUI({ status: 'connected', message: 'Demo Mode — all platforms connected' });
+      return;
+    }
     var fn = AUTH_FN_MAP[activePlatform];
     google.script.run.withSuccessHandler(function(json) {
       updateAuthUI(JSON.parse(json));
@@ -990,6 +1022,12 @@
     selectedAccountIds = [];
     updateAcctCount();
 
+    if (DEMO_MODE) {
+      adAccounts = DEMO_ACCOUNTS[activePlatform] || [];
+      renderAccountCheckboxes();
+      return;
+    }
+
     var fn = ACCT_FN_MAP[activePlatform];
 
     google.script.run.withSuccessHandler(function(json) {
@@ -1172,6 +1210,11 @@
     document.getElementById('progressBar').style.display = 'block';
     document.getElementById('progressFill').style.width = '30%';
     document.getElementById('runStatus').textContent = 'Requesting data from ' + activePlatform + '...';
+
+    if (DEMO_MODE) {
+      simulateDemoReport_(btn);
+      return;
+    }
 
     var config = buildReportConfig();
     var RUN_FN_MAP = {
@@ -1359,19 +1402,29 @@
     document.getElementById('mergeDateSince').value = formatDateInput(thirtyAgo);
 
     // Load connected platforms
-    google.script.run.withSuccessHandler(function(json) {
-      mergeConnectedPlatforms = JSON.parse(json);
+    if (DEMO_MODE) {
+      mergeConnectedPlatforms = ['meta', 'tiktok', 'snapchat', 'reddit', 'pinterest'];
       renderMergePlatforms();
-    }).withFailureHandler(showError).getConnectedPlatforms();
+    } else {
+      google.script.run.withSuccessHandler(function(json) {
+        mergeConnectedPlatforms = JSON.parse(json);
+        renderMergePlatforms();
+      }).withFailureHandler(showError).getConnectedPlatforms();
+    }
 
     // Load merge field/metric catalogs
-    google.script.run.withSuccessHandler(function(json) {
-      renderMergeFieldChips(JSON.parse(json));
-    }).getMergeFieldsCatalog();
+    if (DEMO_MODE) {
+      renderMergeFieldChips(getDemoMergeFields_());
+      renderMergeMetricChips(getDemoMergeMetrics_());
+    } else {
+      google.script.run.withSuccessHandler(function(json) {
+        renderMergeFieldChips(JSON.parse(json));
+      }).getMergeFieldsCatalog();
 
-    google.script.run.withSuccessHandler(function(json) {
-      renderMergeMetricChips(JSON.parse(json));
-    }).getMergeMetricsCatalog();
+      google.script.run.withSuccessHandler(function(json) {
+        renderMergeMetricChips(JSON.parse(json));
+      }).getMergeMetricsCatalog();
+    }
   }
 
   function renderMergePlatforms() {
@@ -1410,13 +1463,21 @@
   }
 
   function loadMergeAccounts(platform) {
+    if (DEMO_MODE) {
+      var demoAccts = DEMO_ACCOUNTS[platform] || [];
+      mergeAccounts[platform] = demoAccts.map(function(a) {
+        return { id: a.id || a.advertiser_id || '', name: a.name || a.advertiser_name || '' };
+      });
+      mergeSelectedAccounts[platform] = mergeAccounts[platform].map(function(a) { return a.id; });
+      renderMergeAcctSections();
+      return;
+    }
     var fn = ACCT_FN_MAP[platform];
     google.script.run.withSuccessHandler(function(json) {
       var accounts = JSON.parse(json);
       mergeAccounts[platform] = accounts.map(function(a) {
         return { id: a.id || a.advertiser_id || '', name: a.name || a.advertiser_name || '' };
       });
-      // Auto-select all accounts
       mergeSelectedAccounts[platform] = mergeAccounts[platform].map(function(a) { return a.id; });
       renderMergeAcctSections();
     }).withFailureHandler(showError)[fn]();
@@ -1520,6 +1581,11 @@
       return;
     }
 
+    if (DEMO_MODE) {
+      simulateDemoMerge_();
+      return;
+    }
+
     var btn = document.getElementById('btnMergeRun');
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Merging...';
@@ -1571,6 +1637,96 @@
         document.getElementById('mergeProgressBar').style.display = 'none';
         showError(err);
       }).runMergedReport(JSON.stringify(config));
+  }
+
+  // ══════════════════════════════════════════════════════════════════════
+  // DEMO MODE HELPERS
+  // ══════════════════════════════════════════════════════════════════════
+
+  function getDemoMergeFields_() {
+    return [
+      { value: 'date', label: 'Date' },
+      { value: 'campaign_name', label: 'Campaign Name' },
+      { value: 'campaign_id', label: 'Campaign ID' },
+      { value: 'adset_name', label: 'Ad Group Name' },
+      { value: 'ad_name', label: 'Ad Name' }
+    ];
+  }
+
+  function getDemoMergeMetrics_() {
+    return [
+      { value: 'impressions', label: 'Impressions' },
+      { value: 'spend', label: 'Spend' },
+      { value: 'clicks', label: 'Clicks' },
+      { value: 'reach', label: 'Reach' },
+      { value: 'ctr', label: 'CTR' },
+      { value: 'cpc', label: 'CPC' },
+      { value: 'cpm', label: 'CPM' },
+      { value: 'frequency', label: 'Frequency' },
+      { value: 'video_views', label: 'Video Views' },
+      { value: 'conversions', label: 'Conversions' }
+    ];
+  }
+
+  function simulateDemoReport_(btn) {
+    var config = buildReportConfig();
+    document.getElementById('progressFill').style.width = '60%';
+    document.getElementById('runStatus').textContent = 'Demo: generating sample data...';
+
+    setTimeout(function() {
+      document.getElementById('progressFill').style.width = '100%';
+      btn.disabled = false;
+      btn.innerHTML = 'Run Report Now';
+
+      var acctCount = selectedAccountIds.length;
+      var metricCount = selectedMetrics.length;
+      var fakeRows = acctCount * 30; // ~30 days of data per account
+      showStatus(
+        'DEMO: Would create sheet with ~' + fakeRows + ' rows, '
+        + metricCount + ' metrics, from ' + acctCount + ' account(s). '
+        + 'Disable DEMO_MODE to run real reports.',
+        'success'
+      );
+      document.getElementById('runStatus').textContent = '';
+      setTimeout(function() {
+        document.getElementById('progressBar').style.display = 'none';
+        document.getElementById('progressFill').style.width = '0%';
+      }, 2000);
+    }, 1200);
+  }
+
+  function simulateDemoMerge_() {
+    var btn = document.getElementById('btnMergeRun');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Merging...';
+    document.getElementById('mergeProgressBar').style.display = 'block';
+    document.getElementById('mergeProgressFill').style.width = '50%';
+    document.getElementById('mergeRunStatus').textContent = 'Demo: simulating cross-platform merge...';
+
+    setTimeout(function() {
+      document.getElementById('mergeProgressFill').style.width = '100%';
+      btn.disabled = false;
+      btn.innerHTML = 'Run Merged Report';
+
+      var totalAccts = 0;
+      mergeSelectedPlatforms.forEach(function(p) {
+        totalAccts += (mergeSelectedAccounts[p] || []).length;
+      });
+      var fakeRows = totalAccts * 30;
+
+      showStatus(
+        'DEMO: Would merge ~' + fakeRows + ' rows from '
+        + mergeSelectedPlatforms.length + ' platforms (' + totalAccts + ' accounts), '
+        + mergeSelectedMetrics.length + ' metrics. '
+        + 'Disable DEMO_MODE to run real reports.',
+        'success'
+      );
+      document.getElementById('mergeRunStatus').textContent = '';
+      setTimeout(function() {
+        document.getElementById('mergeProgressBar').style.display = 'none';
+        document.getElementById('mergeProgressFill').style.width = '0%';
+      }, 2000);
+    }, 1500);
   }
 </script>
 </body>
