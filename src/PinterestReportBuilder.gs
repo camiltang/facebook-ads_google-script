@@ -4,36 +4,50 @@
 
 function runPinterestReport(uiConfig) {
   try {
-    var config = {
-      accountId:   uiConfig.accountId,
+    var accounts = resolveGenericAccounts_(uiConfig);
+    var allRows = [];
+
+    var sampleConfig = {
       level:       uiConfig.dataLevel || 'CAMPAIGN',
       columns:     uiConfig.selectedMetrics || ['SPEND_IN_DOLLAR', 'PAID_IMPRESSION', 'TOTAL_CLICKTHROUGH'],
       startDate:   uiConfig.startDate,
       endDate:     uiConfig.endDate,
       granularity: uiConfig.granularity || 'DAY'
     };
+    var headers = buildPinterestHeaders_(uiConfig, sampleConfig);
+    if (accounts.length > 1) headers = ['Account Name'].concat(headers);
 
-    var rawRows = fetchPinterestAnalytics(config);
+    accounts.forEach(function(acct) {
+      var config = {
+        accountId:   acct.id,
+        level:       sampleConfig.level,
+        columns:     sampleConfig.columns,
+        startDate:   sampleConfig.startDate,
+        endDate:     sampleConfig.endDate,
+        granularity: sampleConfig.granularity
+      };
+      var rawRows = fetchPinterestAnalytics(config);
+      if (rawRows && rawRows.length > 0) {
+        var rows = flattenPinterestRows_(rawRows, uiConfig, config);
+        if (accounts.length > 1) {
+          rows = rows.map(function(row) { return [acct.name].concat(row); });
+        }
+        allRows = allRows.concat(rows);
+      }
+    });
 
-    if (!rawRows || rawRows.length === 0) {
+    if (allRows.length === 0) {
       return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
         message: 'No data returned for the selected criteria.' });
     }
 
-    var headers = buildPinterestHeaders_(uiConfig, config);
-    var rows    = flattenPinterestRows_(rawRows, uiConfig, config);
-
-    if (rows.length === 0) {
-      return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
-        message: 'No data returned for the selected criteria.' });
-    }
-
-    var sheetName = writeReportToSheet(headers, rows, uiConfig.accountName,
-      uiConfig.startDate + ' to ' + uiConfig.endDate, 'Pinterest');
+    var dateLabel = uiConfig.startDate + ' to ' + uiConfig.endDate;
+    var sheetLabel = accounts.length > 1 ? (accounts.length + ' accounts') : accounts[0].name;
+    var sheetName = writeReportToSheet(headers, allRows, sheetLabel, dateLabel, 'Pinterest');
 
     return JSON.stringify({
-      success: true, sheetName: sheetName, rowCount: rows.length,
-      message: 'Report created with ' + rows.length + ' rows.'
+      success: true, sheetName: sheetName, rowCount: allRows.length,
+      message: 'Report created with ' + allRows.length + ' rows from ' + accounts.length + ' account(s).'
     });
   } catch (e) {
     return JSON.stringify({ success: false, message: e.message });

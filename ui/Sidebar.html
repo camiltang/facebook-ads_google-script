@@ -163,6 +163,43 @@
     .auth-code-row { display: flex; gap: 6px; margin-top: 6px; }
     .auth-code-row input { flex: 1; margin-bottom: 0; }
     .auth-code-row .btn { width: auto; margin-top: 0; flex-shrink: 0; }
+
+    /* ── Multi-account checkbox list ──────────────────────────────────── */
+    .account-list {
+      max-height: 200px; overflow-y: auto;
+      border: 1px solid #dadce0; border-radius: 6px;
+      padding: 6px; margin-bottom: 10px;
+    }
+    .account-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 8px; border-radius: 4px; cursor: pointer;
+      font-size: 12px; transition: background 0.1s;
+    }
+    .account-item:hover { background: #f0f2f5; }
+    .account-item input[type="checkbox"] { accent-color: var(--accent); cursor: pointer; }
+    .account-item label { cursor: pointer; margin: 0; color: #202124; font-weight: 400; }
+    .select-all-row {
+      display: flex; align-items: center; gap: 6px;
+      margin-bottom: 6px; font-size: 11px; color: #5f6368;
+    }
+    .select-all-row a { cursor: pointer; font-weight: 500; }
+    .acct-count { font-size: 11px; color: #80868b; margin-bottom: 6px; }
+
+    /* ── Merge view ───────────────────────────────────────────────────── */
+    .merge-view { display: none; }
+    .merge-view.active { display: block; }
+    .platform-check {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px; border: 1px solid #dadce0; border-radius: 6px;
+      margin-bottom: 6px; cursor: pointer; transition: border-color 0.15s;
+    }
+    .platform-check:hover { border-color: var(--accent); }
+    .platform-check.disabled { opacity: 0.45; cursor: not-allowed; }
+    .platform-check input[type="checkbox"] { accent-color: var(--accent); }
+    .platform-check .plat-label { font-weight: 500; font-size: 13px; }
+    .platform-check .plat-status { font-size: 11px; color: #80868b; }
+    .merge-acct-section { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 6px; }
+    .merge-acct-section h4 { font-size: 12px; font-weight: 600; margin-bottom: 6px; }
   </style>
 </head>
 <body>
@@ -174,6 +211,7 @@
   <button class="platform-tab" data-platform="snapchat" onclick="switchPlatform('snapchat')">Snapchat</button>
   <button class="platform-tab" data-platform="reddit" onclick="switchPlatform('reddit')">Reddit</button>
   <button class="platform-tab" data-platform="pinterest" onclick="switchPlatform('pinterest')">Pinterest</button>
+  <button class="platform-tab" data-platform="merge" onclick="switchToMerge()" style="color:#6C3483;">Merge</button>
 </div>
 
 <div class="content">
@@ -323,13 +361,18 @@
 <div class="step" id="step2">
   <div class="step-header">
     <div class="step-num">2</div>
-    <h2 id="acctTitle">Select Ad Account</h2>
+    <h2 id="acctTitle">Select Ad Account(s)</h2>
   </div>
 
-  <label id="acctLabel">Ad Account</label>
-  <select id="accountSelect">
-    <option value="">Loading accounts...</option>
-  </select>
+  <label id="acctLabel">Ad Accounts</label>
+  <div class="select-all-row">
+    <a onclick="toggleAllAccounts(true)">Select All</a> |
+    <a onclick="toggleAllAccounts(false)">Clear</a>
+  </div>
+  <div class="account-list" id="accountList">
+    <div style="color:#80868b; padding:8px;">Loading accounts...</div>
+  </div>
+  <div class="acct-count" id="acctCount">0 accounts selected</div>
 
   <div id="accountInfo" style="display:none; font-size:12px; color:#5f6368; margin-bottom:10px;"></div>
 
@@ -482,6 +525,58 @@
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════════════════════
+     MERGE VIEW — Cross-platform data merge
+     ═══════════════════════════════════════════════════════════════════════ -->
+<div class="merge-view" id="mergeView">
+  <div class="step-header" style="border-color:#6C3483;">
+    <div class="step-num" style="background:#6C3483;">M</div>
+    <h2>Merge Across Platforms</h2>
+  </div>
+
+  <p class="helper-text" style="margin-bottom:12px;">
+    Pull data from multiple connected platforms and combine into one sheet with normalized column names.
+  </p>
+
+  <h3>1. Select Platforms</h3>
+  <div id="mergePlatformList"></div>
+
+  <h3>2. Select Accounts per Platform</h3>
+  <div id="mergeAcctSections">
+    <p class="helper-text">Select platforms above first.</p>
+  </div>
+
+  <h3>3. Reporting Level</h3>
+  <select id="mergeLevelSelect">
+    <option value="campaign">Campaign</option>
+    <option value="adset">Ad Group / Ad Set</option>
+    <option value="ad">Ad</option>
+  </select>
+
+  <h3>4. Date Range</h3>
+  <div class="date-row">
+    <div><label>Start</label><input type="date" id="mergeDateSince"></div>
+    <div><label>End</label><input type="date" id="mergeDateUntil"></div>
+  </div>
+
+  <h3>5. Common Fields (join keys)</h3>
+  <div class="chip-group" id="mergeFieldChips"></div>
+
+  <h3>6. Common Metrics</h3>
+  <div class="chip-group" id="mergeMetricChips"></div>
+  <div style="font-size:11px; color:#80868b;" id="mergeMetricCount">0 metrics selected</div>
+
+  <div style="margin-top:16px;">
+    <button class="btn btn-primary" id="btnMergeRun" onclick="executeMerge()" style="background:#6C3483;">
+      Run Merged Report
+    </button>
+    <div class="progress-bar" id="mergeProgressBar" style="display:none;">
+      <div class="progress-fill" id="mergeProgressFill" style="width:0%; background:#6C3483;"></div>
+    </div>
+    <div id="mergeRunStatus" style="font-size:12px; color:#5f6368; margin-top:6px;"></div>
+  </div>
+</div>
+
 </div><!-- /content -->
 
 
@@ -594,10 +689,20 @@
   var activePlatform  = 'meta';
   var currentStep     = 1;
   var adAccounts      = [];
+  var selectedAccountIds = [];
   var metricsCatalog  = [];
   var breakdownsCatalog = [];
   var selectedMetrics    = [];
   var selectedBreakdowns = [];
+  var isMergeMode = false;
+
+  // Merge state
+  var mergeConnectedPlatforms = [];
+  var mergeSelectedPlatforms  = [];
+  var mergeAccounts = {};   // { platform: [{id,name},...] }
+  var mergeSelectedAccounts = {};  // { platform: [id,...] }
+  var mergeSelectedFields   = ['date', 'campaign_name'];
+  var mergeSelectedMetrics  = [];
 
   // ── Init ───────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
@@ -607,8 +712,14 @@
 
   // ── Platform switching ─────────────────────────────────────────────
   function switchPlatform(platform) {
+    isMergeMode = false;
     activePlatform = platform;
     var cfg = PLATFORMS[platform];
+
+    // Hide merge view, show steps
+    document.getElementById('mergeView').classList.remove('active');
+    document.querySelectorAll('.step').forEach(function(s) { s.style.display = ''; });
+    document.getElementById('stepper').style.display = '';
 
     // CSS accent color
     document.documentElement.style.setProperty('--accent', cfg.accent);
@@ -621,6 +732,7 @@
     // Reset state
     currentStep = 1;
     adAccounts = [];
+    selectedAccountIds = [];
     metricsCatalog = [];
     breakdownsCatalog = [];
     selectedMetrics = [];
@@ -864,45 +976,77 @@
     });
   }
 
-  // ── Account loading ────────────────────────────────────────────────
-  function loadAccounts() {
-    var sel = document.getElementById('accountSelect');
-    sel.innerHTML = '<option value="">Loading accounts...</option>';
-    document.getElementById('btnNext2').disabled = true;
+  // ── Account loading (multi-select) ─────────────────────────────────
+  var ACCT_FN_MAP = {
+    meta: 'fetchAdAccounts', tiktok: 'fetchTikTokAdvertisers',
+    snapchat: 'fetchSnapAdAccounts', reddit: 'fetchRedditAdAccounts',
+    pinterest: 'fetchPinterestAdAccounts'
+  };
 
-    var ACCT_FN_MAP = {
-      meta: 'fetchAdAccounts', tiktok: 'fetchTikTokAdvertisers',
-      snapchat: 'fetchSnapAdAccounts', reddit: 'fetchRedditAdAccounts',
-      pinterest: 'fetchPinterestAdAccounts'
-    };
+  function loadAccounts() {
+    var container = document.getElementById('accountList');
+    container.innerHTML = '<div style="color:#80868b; padding:8px;">Loading accounts...</div>';
+    document.getElementById('btnNext2').disabled = true;
+    selectedAccountIds = [];
+    updateAcctCount();
+
     var fn = ACCT_FN_MAP[activePlatform];
 
     google.script.run.withSuccessHandler(function(json) {
       adAccounts = JSON.parse(json);
-      sel.innerHTML = '<option value="">-- Select an account --</option>';
-      adAccounts.forEach(function(a) {
-        var opt = document.createElement('option');
-        // Normalize ID field
-        opt.value = a.id || a.advertiser_id || '';
-        var name = a.name || a.advertiser_name || ('Account ' + opt.value);
-        var idLabel = a.account_id || a.advertiser_id || opt.value;
-        opt.textContent = name + ' (' + idLabel + ')';
-        sel.appendChild(opt);
+      renderAccountCheckboxes();
+    }).withFailureHandler(function(e) {
+      container.innerHTML = '<div style="color:#c62828; padding:8px;">Error loading accounts.</div>';
+      showError(e);
+    })[fn]();
+  }
+
+  function renderAccountCheckboxes() {
+    var container = document.getElementById('accountList');
+    container.innerHTML = '';
+    selectedAccountIds = [];
+
+    adAccounts.forEach(function(a) {
+      var id = a.id || a.advertiser_id || '';
+      var name = a.name || a.advertiser_name || ('Account ' + id);
+      var idLabel = a.account_id || a.advertiser_id || id;
+
+      var item = document.createElement('div');
+      item.className = 'account-item';
+      item.innerHTML = '<input type="checkbox" id="acct_' + id + '" value="' + id + '">'
+        + '<label for="acct_' + id + '">' + name + ' <span style="color:#80868b;">(' + idLabel + ')</span></label>';
+      item.querySelector('input').addEventListener('change', function() {
+        if (this.checked) {
+          selectedAccountIds.push(id);
+        } else {
+          selectedAccountIds = selectedAccountIds.filter(function(x) { return x !== id; });
+        }
+        updateAcctCount();
+        document.getElementById('btnNext2').disabled = selectedAccountIds.length === 0;
       });
-      sel.onchange = function() {
-        document.getElementById('btnNext2').disabled = !sel.value;
-        var info = document.getElementById('accountInfo');
-        var acct = adAccounts.find(function(a) { return (a.id || a.advertiser_id) === sel.value; });
-        if (acct && (acct.currency || acct.timezone_name || acct.timezone || acct.country)) {
-          info.style.display = 'block';
-          var parts = [];
-          if (acct.currency) parts.push('Currency: ' + acct.currency);
-          if (acct.timezone_name || acct.timezone) parts.push('TZ: ' + (acct.timezone_name || acct.timezone));
-          if (acct.country) parts.push('Country: ' + acct.country);
-          info.textContent = parts.join(' | ');
-        } else { info.style.display = 'none'; }
-      };
-    }).withFailureHandler(function(e) { sel.innerHTML = '<option>Error loading</option>'; showError(e); })[fn]();
+      container.appendChild(item);
+    });
+
+    // Auto-select if only one account
+    if (adAccounts.length === 1) {
+      var cb = container.querySelector('input[type="checkbox"]');
+      if (cb) { cb.checked = true; cb.dispatchEvent(new Event('change')); }
+    }
+  }
+
+  function toggleAllAccounts(selectAll) {
+    var checkboxes = document.querySelectorAll('#accountList input[type="checkbox"]');
+    selectedAccountIds = [];
+    checkboxes.forEach(function(cb) {
+      cb.checked = selectAll;
+      if (selectAll) selectedAccountIds.push(cb.value);
+    });
+    updateAcctCount();
+    document.getElementById('btnNext2').disabled = selectedAccountIds.length === 0;
+  }
+
+  function updateAcctCount() {
+    document.getElementById('acctCount').textContent = selectedAccountIds.length + ' account(s) selected';
   }
 
   // ── Metric / Breakdown chips ───────────────────────────────────────
@@ -989,8 +1133,11 @@
 
   // ── Summary ────────────────────────────────────────────────────────
   function buildSummary() {
-    var sel = document.getElementById('accountSelect');
-    var acctName = sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : 'N/A';
+    var acctName = selectedAccountIds.length + ' account(s)';
+    if (selectedAccountIds.length === 1) {
+      var acct = adAccounts.find(function(a) { return (a.id || a.advertiser_id) === selectedAccountIds[0]; });
+      acctName = acct ? (acct.name || acct.advertiser_name) : selectedAccountIds[0];
+    }
     var level = document.getElementById('levelSelect');
     var levelTxt = level.options[level.selectedIndex] ? level.options[level.selectedIndex].textContent : '';
 
@@ -1051,15 +1198,23 @@
   }
 
   function buildReportConfig() {
-    var sel = document.getElementById('accountSelect');
-    var acct = adAccounts.find(function(a) { return (a.id || a.advertiser_id) === sel.value; });
-    var acctName = acct ? (acct.name || acct.advertiser_name) : 'Report';
+    // Build accounts array for multi-account support
+    var accounts = [];
+    selectedAccountIds.forEach(function(id) {
+      var acct = adAccounts.find(function(a) { return (a.id || a.advertiser_id) === id; });
+      accounts.push({
+        id: id,
+        name: acct ? (acct.name || acct.advertiser_name) : id
+      });
+    });
+    var firstAcct = accounts[0] || { id: '', name: 'Report' };
+    var isMulti = accounts.length > 1;
 
     if (activePlatform === 'meta') {
       var datePreset = document.getElementById('datePresetSelect').value;
-      return {
-        accountId:          sel.value,
-        accountName:        acctName,
+      var cfg = {
+        accountId:          firstAcct.id,
+        accountName:        firstAcct.name,
         level:              document.getElementById('levelSelect').value,
         datePreset:         datePreset,
         since:              datePreset === 'custom' ? document.getElementById('dateSince').value : null,
@@ -1068,22 +1223,26 @@
         selectedMetrics:    selectedMetrics,
         selectedBreakdowns: selectedBreakdowns
       };
+      if (isMulti) { cfg.accountIds = selectedAccountIds; cfg.accounts = accounts; }
+      return cfg;
     } else if (activePlatform === 'tiktok') {
-      return {
-        advertiserId:       sel.value,
-        advertiserName:     acctName,
+      var cfg = {
+        advertiserId:       firstAcct.id,
+        advertiserName:     firstAcct.name,
         dataLevel:          document.getElementById('levelSelect').value,
         startDate:          document.getElementById('dateSince').value,
         endDate:            document.getElementById('dateUntil').value,
         selectedMetrics:    selectedMetrics,
         selectedDimensions: selectedBreakdowns
       };
+      if (isMulti) { cfg.accountIds = selectedAccountIds; cfg.accounts = accounts; }
+      return cfg;
     } else {
       // Snapchat, Reddit, Pinterest — common shape
       var granSel = document.getElementById('granularitySelect');
-      return {
-        accountId:          sel.value,
-        accountName:        acctName,
+      var cfg = {
+        accountId:          firstAcct.id,
+        accountName:        firstAcct.name,
         dataLevel:          document.getElementById('levelSelect').value,
         startDate:          document.getElementById('dateSince').value,
         endDate:            document.getElementById('dateUntil').value,
@@ -1091,6 +1250,8 @@
         selectedMetrics:    selectedMetrics,
         selectedDimensions: selectedBreakdowns
       };
+      if (isMulti) { cfg.accountIds = selectedAccountIds; cfg.accounts = accounts; }
+      return cfg;
     }
   }
 
@@ -1174,6 +1335,242 @@
   function formatDateInput(d) {
     var m = d.getMonth() + 1; var day = d.getDate();
     return d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+  }
+
+  // ── Merge mode ──────────────────────────────────────────────────────
+  function switchToMerge() {
+    isMergeMode = true;
+    document.documentElement.style.setProperty('--accent', '#6C3483');
+
+    // Tab highlight
+    document.querySelectorAll('.platform-tab').forEach(function(t) {
+      t.classList.toggle('active', t.dataset.platform === 'merge');
+    });
+
+    // Hide platform steps, show merge view
+    document.querySelectorAll('.step').forEach(function(s) { s.classList.remove('active'); s.style.display = 'none'; });
+    document.getElementById('stepper').style.display = 'none';
+    document.getElementById('mergeView').classList.add('active');
+
+    // Set default dates
+    var today = new Date();
+    var thirtyAgo = new Date(today); thirtyAgo.setDate(today.getDate() - 30);
+    document.getElementById('mergeDateUntil').value = formatDateInput(today);
+    document.getElementById('mergeDateSince').value = formatDateInput(thirtyAgo);
+
+    // Load connected platforms
+    google.script.run.withSuccessHandler(function(json) {
+      mergeConnectedPlatforms = JSON.parse(json);
+      renderMergePlatforms();
+    }).withFailureHandler(showError).getConnectedPlatforms();
+
+    // Load merge field/metric catalogs
+    google.script.run.withSuccessHandler(function(json) {
+      renderMergeFieldChips(JSON.parse(json));
+    }).getMergeFieldsCatalog();
+
+    google.script.run.withSuccessHandler(function(json) {
+      renderMergeMetricChips(JSON.parse(json));
+    }).getMergeMetricsCatalog();
+  }
+
+  function renderMergePlatforms() {
+    var container = document.getElementById('mergePlatformList');
+    container.innerHTML = '';
+    mergeSelectedPlatforms = [];
+    mergeAccounts = {};
+    mergeSelectedAccounts = {};
+
+    var allPlatforms = ['meta', 'tiktok', 'snapchat', 'reddit', 'pinterest'];
+    var labels = { meta: 'Meta', tiktok: 'TikTok', snapchat: 'Snapchat', reddit: 'Reddit', pinterest: 'Pinterest' };
+
+    allPlatforms.forEach(function(p) {
+      var connected = mergeConnectedPlatforms.indexOf(p) > -1;
+      var div = document.createElement('div');
+      div.className = 'platform-check' + (connected ? '' : ' disabled');
+      div.innerHTML = '<input type="checkbox" id="merge_plat_' + p + '" ' + (connected ? '' : 'disabled') + '>'
+        + '<div><div class="plat-label">' + labels[p] + '</div>'
+        + '<div class="plat-status">' + (connected ? 'Connected' : 'Not connected') + '</div></div>';
+
+      if (connected) {
+        div.querySelector('input').addEventListener('change', function() {
+          if (this.checked) {
+            mergeSelectedPlatforms.push(p);
+            loadMergeAccounts(p);
+          } else {
+            mergeSelectedPlatforms = mergeSelectedPlatforms.filter(function(x) { return x !== p; });
+            delete mergeAccounts[p];
+            delete mergeSelectedAccounts[p];
+            renderMergeAcctSections();
+          }
+        });
+      }
+      container.appendChild(div);
+    });
+  }
+
+  function loadMergeAccounts(platform) {
+    var fn = ACCT_FN_MAP[platform];
+    google.script.run.withSuccessHandler(function(json) {
+      var accounts = JSON.parse(json);
+      mergeAccounts[platform] = accounts.map(function(a) {
+        return { id: a.id || a.advertiser_id || '', name: a.name || a.advertiser_name || '' };
+      });
+      // Auto-select all accounts
+      mergeSelectedAccounts[platform] = mergeAccounts[platform].map(function(a) { return a.id; });
+      renderMergeAcctSections();
+    }).withFailureHandler(showError)[fn]();
+  }
+
+  function renderMergeAcctSections() {
+    var container = document.getElementById('mergeAcctSections');
+    container.innerHTML = '';
+    var labels = { meta: 'Meta', tiktok: 'TikTok', snapchat: 'Snapchat', reddit: 'Reddit', pinterest: 'Pinterest' };
+
+    mergeSelectedPlatforms.forEach(function(p) {
+      var section = document.createElement('div');
+      section.className = 'merge-acct-section';
+      section.innerHTML = '<h4>' + labels[p] + ' Accounts</h4>';
+
+      var accts = mergeAccounts[p] || [];
+      if (accts.length === 0) {
+        section.innerHTML += '<p class="helper-text">Loading...</p>';
+      } else {
+        accts.forEach(function(a) {
+          var checked = (mergeSelectedAccounts[p] || []).indexOf(a.id) > -1;
+          var item = document.createElement('div');
+          item.className = 'account-item';
+          item.innerHTML = '<input type="checkbox" ' + (checked ? 'checked' : '') + ' value="' + a.id + '">'
+            + '<label>' + a.name + '</label>';
+          item.querySelector('input').addEventListener('change', function() {
+            if (!mergeSelectedAccounts[p]) mergeSelectedAccounts[p] = [];
+            if (this.checked) {
+              mergeSelectedAccounts[p].push(a.id);
+            } else {
+              mergeSelectedAccounts[p] = mergeSelectedAccounts[p].filter(function(x) { return x !== a.id; });
+            }
+          });
+          section.appendChild(item);
+        });
+      }
+      container.appendChild(section);
+    });
+
+    if (mergeSelectedPlatforms.length === 0) {
+      container.innerHTML = '<p class="helper-text">Select platforms above first.</p>';
+    }
+  }
+
+  function renderMergeFieldChips(fields) {
+    var container = document.getElementById('mergeFieldChips');
+    container.innerHTML = '';
+    var chipsDiv = document.createElement('div');
+    chipsDiv.className = 'chips';
+    fields.forEach(function(f) {
+      var chip = document.createElement('span');
+      chip.className = 'chip' + (mergeSelectedFields.indexOf(f.value) > -1 ? ' selected' : '');
+      chip.textContent = f.label;
+      chip.dataset.value = f.value;
+      chip.onclick = function() {
+        var idx = mergeSelectedFields.indexOf(f.value);
+        if (idx > -1) { mergeSelectedFields.splice(idx, 1); chip.classList.remove('selected'); }
+        else { mergeSelectedFields.push(f.value); chip.classList.add('selected'); }
+      };
+      chipsDiv.appendChild(chip);
+    });
+    container.appendChild(chipsDiv);
+  }
+
+  function renderMergeMetricChips(metrics) {
+    var container = document.getElementById('mergeMetricChips');
+    container.innerHTML = '';
+    mergeSelectedMetrics = [];
+    var chipsDiv = document.createElement('div');
+    chipsDiv.className = 'chips';
+    metrics.forEach(function(m) {
+      var chip = document.createElement('span');
+      chip.className = 'chip';
+      chip.textContent = m.label;
+      chip.dataset.value = m.value;
+      chip.onclick = function() {
+        var idx = mergeSelectedMetrics.indexOf(m.value);
+        if (idx > -1) { mergeSelectedMetrics.splice(idx, 1); chip.classList.remove('selected'); }
+        else { mergeSelectedMetrics.push(m.value); chip.classList.add('selected'); }
+        document.getElementById('mergeMetricCount').textContent = mergeSelectedMetrics.length + ' metrics selected';
+      };
+      chipsDiv.appendChild(chip);
+    });
+    container.appendChild(chipsDiv);
+
+    // Auto-select essentials
+    ['impressions', 'spend', 'clicks'].forEach(function(key) {
+      var chip = container.querySelector('[data-value="' + key + '"]');
+      if (chip) { chip.classList.add('selected'); mergeSelectedMetrics.push(key); }
+    });
+    document.getElementById('mergeMetricCount').textContent = mergeSelectedMetrics.length + ' metrics selected';
+  }
+
+  function executeMerge() {
+    if (mergeSelectedPlatforms.length < 2) {
+      showStatus('Select at least 2 platforms to merge.', 'error');
+      return;
+    }
+    if (mergeSelectedMetrics.length === 0) {
+      showStatus('Select at least one metric.', 'error');
+      return;
+    }
+
+    var btn = document.getElementById('btnMergeRun');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Merging...';
+    document.getElementById('mergeProgressBar').style.display = 'block';
+    document.getElementById('mergeProgressFill').style.width = '30%';
+    document.getElementById('mergeRunStatus').textContent = 'Pulling data from ' + mergeSelectedPlatforms.length + ' platforms...';
+
+    // Build platformAccounts map with {id, name} objects
+    var platformAccounts = {};
+    mergeSelectedPlatforms.forEach(function(p) {
+      var ids = mergeSelectedAccounts[p] || [];
+      var all = mergeAccounts[p] || [];
+      platformAccounts[p] = ids.map(function(id) {
+        var a = all.find(function(x) { return x.id === id; });
+        return { id: id, name: a ? a.name : id };
+      });
+    });
+
+    var config = {
+      platforms: mergeSelectedPlatforms,
+      platformAccounts: platformAccounts,
+      mergeFields: mergeSelectedFields,
+      mergeMetrics: mergeSelectedMetrics,
+      level: document.getElementById('mergeLevelSelect').value,
+      startDate: document.getElementById('mergeDateSince').value,
+      endDate: document.getElementById('mergeDateUntil').value
+    };
+
+    google.script.run
+      .withSuccessHandler(function(json) {
+        var result = JSON.parse(json);
+        document.getElementById('mergeProgressFill').style.width = '100%';
+        btn.disabled = false;
+        btn.innerHTML = 'Run Merged Report';
+        if (result.success) {
+          document.getElementById('mergeRunStatus').textContent = '';
+          showStatus(result.message, 'success');
+        } else {
+          showStatus(result.message, 'error');
+        }
+        setTimeout(function() {
+          document.getElementById('mergeProgressBar').style.display = 'none';
+          document.getElementById('mergeProgressFill').style.width = '0%';
+        }, 2000);
+      })
+      .withFailureHandler(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = 'Run Merged Report';
+        document.getElementById('mergeProgressBar').style.display = 'none';
+        showError(err);
+      }).runMergedReport(JSON.stringify(config));
   }
 </script>
 </body>

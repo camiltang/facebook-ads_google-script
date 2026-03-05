@@ -5,35 +5,76 @@
 
 /**
  * Main entry: runs a report from sidebar-provided config and writes to a new sheet.
+ * Supports single account (accountId) or multiple accounts (accountIds[]).
  * @param {Object} uiConfig {
- *   accountId, accountName, level, datePreset, since, until,
+ *   accountId|accountIds[], accountName|accounts[], level, datePreset, since, until,
  *   timeIncrement, selectedMetrics[], selectedBreakdowns[]
  * }
  * @return {string} JSON { success, sheetName, rowCount, message }
  */
 function runReport(uiConfig) {
   try {
-    var config = buildApiConfig_(uiConfig);
-    var rawRows = fetchInsightsSync(config);
+    var accounts = resolveMetaAccounts_(uiConfig);
+    var allRows = [];
+    var headers = buildHeaders_(uiConfig);
 
-    if (!rawRows || rawRows.length === 0) {
+    // Prepend "Account Name" header when pulling multiple accounts
+    if (accounts.length > 1) {
+      headers = ['Account Name'].concat(headers);
+    }
+
+    accounts.forEach(function(acct) {
+      var singleConfig = copyObj_(uiConfig);
+      singleConfig.accountId = acct.id;
+      singleConfig.accountName = acct.name;
+
+      var apiConfig = buildApiConfig_(singleConfig);
+      var rawRows = fetchInsightsSync(apiConfig);
+      if (rawRows && rawRows.length > 0) {
+        var rows = flattenRows_(rawRows, singleConfig);
+        if (accounts.length > 1) {
+          rows = rows.map(function(row) { return [acct.name].concat(row); });
+        }
+        allRows = allRows.concat(rows);
+      }
+    });
+
+    if (allRows.length === 0) {
       return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
         message: 'No data returned for the selected criteria.' });
     }
 
-    var headers = buildHeaders_(uiConfig);
-    var rows    = flattenRows_(rawRows, uiConfig);
-    var sheetName = writeReportToSheet(headers, rows, uiConfig.accountName, uiConfig.datePreset);
+    var dateLabel = uiConfig.datePreset || (uiConfig.since + ' to ' + uiConfig.until);
+    var sheetLabel = accounts.length > 1 ? (accounts.length + ' accounts') : accounts[0].name;
+    var sheetName = writeReportToSheet(headers, allRows, sheetLabel, dateLabel);
 
     return JSON.stringify({
       success: true,
       sheetName: sheetName,
-      rowCount: rows.length,
-      message: 'Report created with ' + rows.length + ' rows.'
+      rowCount: allRows.length,
+      message: 'Report created with ' + allRows.length + ' rows from ' + accounts.length + ' account(s).'
     });
   } catch (e) {
     return JSON.stringify({ success: false, message: e.message });
   }
+}
+
+/**
+ * Resolves account list from uiConfig — supports single or multi-account.
+ */
+function resolveMetaAccounts_(uiConfig) {
+  if (uiConfig.accountIds && uiConfig.accountIds.length > 0) {
+    var accountsMap = {};
+    (uiConfig.accounts || []).forEach(function(a) { accountsMap[a.id] = a.name; });
+    return uiConfig.accountIds.map(function(id) {
+      return { id: id, name: accountsMap[id] || id };
+    });
+  }
+  return [{ id: uiConfig.accountId, name: uiConfig.accountName || 'Report' }];
+}
+
+function copyObj_(obj) {
+  return JSON.parse(JSON.stringify(obj));
 }
 
 /**

@@ -16,6 +16,8 @@ function onOpen(e) {
     .addItem('Re-run Last Snapchat Report', 'rerunLastSnapReport')
     .addItem('Re-run Last Reddit Report', 'rerunLastRedditReport')
     .addItem('Re-run Last Pinterest Report', 'rerunLastPinterestReport')
+    .addSeparator()
+    .addItem('Merge Cross-Platform Data', 'showSidebar')
     .addToUi();
 }
 

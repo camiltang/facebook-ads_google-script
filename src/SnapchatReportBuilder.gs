@@ -4,11 +4,12 @@
 
 function runSnapchatReport(uiConfig) {
   try {
+    var accounts = resolveGenericAccounts_(uiConfig);
     var startTime = toSnapTimestamp_(uiConfig.startDate);
     var endTime   = toSnapTimestamp_(uiConfig.endDate, true);
+    var allRows = [];
 
-    var config = {
-      accountId:   uiConfig.accountId,
+    var sampleConfig = {
       level:       uiConfig.dataLevel || 'campaigns',
       fields:      uiConfig.selectedMetrics || ['impressions', 'spend'],
       granularity: uiConfig.granularity || 'DAY',
@@ -16,28 +17,41 @@ function runSnapchatReport(uiConfig) {
       endTime:     endTime,
       breakdown:   (uiConfig.selectedDimensions && uiConfig.selectedDimensions[0]) || ''
     };
+    var headers = buildSnapHeaders_(uiConfig, sampleConfig);
+    if (accounts.length > 1) headers = ['Account Name'].concat(headers);
 
-    var rawStats = fetchSnapStats(config);
+    accounts.forEach(function(acct) {
+      var config = {
+        accountId:   acct.id,
+        level:       sampleConfig.level,
+        fields:      sampleConfig.fields,
+        granularity: sampleConfig.granularity,
+        startTime:   startTime,
+        endTime:     endTime,
+        breakdown:   sampleConfig.breakdown
+      };
+      var rawStats = fetchSnapStats(config);
+      if (rawStats && rawStats.length > 0) {
+        var rows = flattenSnapRows_(rawStats, uiConfig, config);
+        if (accounts.length > 1) {
+          rows = rows.map(function(row) { return [acct.name].concat(row); });
+        }
+        allRows = allRows.concat(rows);
+      }
+    });
 
-    if (!rawStats || rawStats.length === 0) {
+    if (allRows.length === 0) {
       return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
         message: 'No data returned for the selected criteria.' });
     }
 
-    var headers = buildSnapHeaders_(uiConfig, config);
-    var rows    = flattenSnapRows_(rawStats, uiConfig, config);
-
-    if (rows.length === 0) {
-      return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
-        message: 'No data returned for the selected criteria.' });
-    }
-
-    var sheetName = writeReportToSheet(headers, rows, uiConfig.accountName,
-      uiConfig.startDate + ' to ' + uiConfig.endDate, 'Snapchat');
+    var dateLabel = uiConfig.startDate + ' to ' + uiConfig.endDate;
+    var sheetLabel = accounts.length > 1 ? (accounts.length + ' accounts') : accounts[0].name;
+    var sheetName = writeReportToSheet(headers, allRows, sheetLabel, dateLabel, 'Snapchat');
 
     return JSON.stringify({
-      success: true, sheetName: sheetName, rowCount: rows.length,
-      message: 'Report created with ' + rows.length + ' rows.'
+      success: true, sheetName: sheetName, rowCount: allRows.length,
+      message: 'Report created with ' + allRows.length + ' rows from ' + accounts.length + ' account(s).'
     });
   } catch (e) {
     return JSON.stringify({ success: false, message: e.message });

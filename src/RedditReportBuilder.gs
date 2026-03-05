@@ -4,8 +4,10 @@
 
 function runRedditReport(uiConfig) {
   try {
-    var config = {
-      accountId:   uiConfig.accountId,
+    var accounts = resolveGenericAccounts_(uiConfig);
+    var allRows = [];
+
+    var sampleConfig = {
       level:       uiConfig.dataLevel || 'campaign',
       metrics:     uiConfig.selectedMetrics || ['impressions', 'spend', 'clicks'],
       startDate:   uiConfig.startDate,
@@ -13,28 +15,41 @@ function runRedditReport(uiConfig) {
       granularity: uiConfig.granularity || 'DAY',
       breakdown:   (uiConfig.selectedDimensions && uiConfig.selectedDimensions[0]) || ''
     };
+    var headers = buildRedditHeaders_(uiConfig, sampleConfig);
+    if (accounts.length > 1) headers = ['Account Name'].concat(headers);
 
-    var rawRows = fetchRedditReport(config);
+    accounts.forEach(function(acct) {
+      var config = {
+        accountId:   acct.id,
+        level:       sampleConfig.level,
+        metrics:     sampleConfig.metrics,
+        startDate:   sampleConfig.startDate,
+        endDate:     sampleConfig.endDate,
+        granularity: sampleConfig.granularity,
+        breakdown:   sampleConfig.breakdown
+      };
+      var rawRows = fetchRedditReport(config);
+      if (rawRows && rawRows.length > 0) {
+        var rows = flattenRedditRows_(rawRows, uiConfig, config);
+        if (accounts.length > 1) {
+          rows = rows.map(function(row) { return [acct.name].concat(row); });
+        }
+        allRows = allRows.concat(rows);
+      }
+    });
 
-    if (!rawRows || rawRows.length === 0) {
+    if (allRows.length === 0) {
       return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
         message: 'No data returned for the selected criteria.' });
     }
 
-    var headers = buildRedditHeaders_(uiConfig, config);
-    var rows    = flattenRedditRows_(rawRows, uiConfig, config);
-
-    if (rows.length === 0) {
-      return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
-        message: 'No data returned for the selected criteria.' });
-    }
-
-    var sheetName = writeReportToSheet(headers, rows, uiConfig.accountName,
-      uiConfig.startDate + ' to ' + uiConfig.endDate, 'Reddit');
+    var dateLabel = uiConfig.startDate + ' to ' + uiConfig.endDate;
+    var sheetLabel = accounts.length > 1 ? (accounts.length + ' accounts') : accounts[0].name;
+    var sheetName = writeReportToSheet(headers, allRows, sheetLabel, dateLabel, 'Reddit');
 
     return JSON.stringify({
-      success: true, sheetName: sheetName, rowCount: rows.length,
-      message: 'Report created with ' + rows.length + ' rows.'
+      success: true, sheetName: sheetName, rowCount: allRows.length,
+      message: 'Report created with ' + allRows.length + ' rows from ' + accounts.length + ' account(s).'
     });
   } catch (e) {
     return JSON.stringify({ success: false, message: e.message });

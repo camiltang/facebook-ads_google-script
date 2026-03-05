@@ -9,7 +9,8 @@ var PLATFORM_COLORS = {
   'TikTok':   '#000000',
   'Snapchat': '#FFFC00',
   'Reddit':   '#FF4500',
-  'Pinterest':'#E60023'
+  'Pinterest':'#E60023',
+  'Merged':   '#6C3483'
 };
 
 /**
@@ -114,4 +115,21 @@ function detectPlatformFromCaller_() {
     if (e.stack && e.stack.indexOf('TikTok') > -1) return 'TikTok';
   }
   return 'Meta';
+}
+
+// ── Multi-account helpers (shared) ──────────────────────────────────────────
+
+/**
+ * Resolves account list from uiConfig for Snapchat/Reddit/Pinterest.
+ * Supports single (accountId) or multiple (accountIds[]) accounts.
+ */
+function resolveGenericAccounts_(uiConfig) {
+  if (uiConfig.accountIds && uiConfig.accountIds.length > 0) {
+    var accountsMap = {};
+    (uiConfig.accounts || []).forEach(function(a) { accountsMap[a.id] = a.name; });
+    return uiConfig.accountIds.map(function(id) {
+      return { id: id, name: accountsMap[id] || id };
+    });
+  }
+  return [{ id: uiConfig.accountId, name: uiConfig.accountName || 'Report' }];
 }

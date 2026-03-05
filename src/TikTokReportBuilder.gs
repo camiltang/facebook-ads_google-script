@@ -13,27 +13,52 @@
  */
 function runTikTokReport(uiConfig) {
   try {
-    var config = buildTikTokApiConfig_(uiConfig);
-    var rawRows = fetchTikTokReport(config);
+    var accounts = resolveTikTokAccounts_(uiConfig);
+    var allRows = [];
+    var headers = buildTikTokHeaders_(uiConfig);
+    if (accounts.length > 1) headers = ['Account Name'].concat(headers);
 
-    if (!rawRows || rawRows.length === 0) {
+    accounts.forEach(function(acct) {
+      var singleConfig = JSON.parse(JSON.stringify(uiConfig));
+      singleConfig.advertiserId = acct.id;
+      singleConfig.advertiserName = acct.name;
+
+      var apiConfig = buildTikTokApiConfig_(singleConfig);
+      var rawRows = fetchTikTokReport(apiConfig);
+      if (rawRows && rawRows.length > 0) {
+        var rows = flattenTikTokRows_(rawRows, singleConfig);
+        if (accounts.length > 1) {
+          rows = rows.map(function(row) { return [acct.name].concat(row); });
+        }
+        allRows = allRows.concat(rows);
+      }
+    });
+
+    if (allRows.length === 0) {
       return JSON.stringify({ success: true, sheetName: null, rowCount: 0,
         message: 'No data returned for the selected criteria.' });
     }
 
-    var headers = buildTikTokHeaders_(uiConfig);
-    var rows    = flattenTikTokRows_(rawRows, uiConfig);
-    var sheetName = writeReportToSheet(headers, rows, uiConfig.advertiserName, uiConfig.startDate + ' to ' + uiConfig.endDate, 'TikTok');
+    var dateLabel = uiConfig.startDate + ' to ' + uiConfig.endDate;
+    var sheetLabel = accounts.length > 1 ? (accounts.length + ' accounts') : accounts[0].name;
+    var sheetName = writeReportToSheet(headers, allRows, sheetLabel, dateLabel, 'TikTok');
 
     return JSON.stringify({
-      success: true,
-      sheetName: sheetName,
-      rowCount: rows.length,
-      message: 'Report created with ' + rows.length + ' rows.'
+      success: true, sheetName: sheetName, rowCount: allRows.length,
+      message: 'Report created with ' + allRows.length + ' rows from ' + accounts.length + ' account(s).'
     });
   } catch (e) {
     return JSON.stringify({ success: false, message: e.message });
   }
+}
+
+function resolveTikTokAccounts_(uiConfig) {
+  if (uiConfig.accountIds && uiConfig.accountIds.length > 0) {
+    var map = {};
+    (uiConfig.accounts || []).forEach(function(a) { map[a.id] = a.name; });
+    return uiConfig.accountIds.map(function(id) { return { id: id, name: map[id] || id }; });
+  }
+  return [{ id: uiConfig.advertiserId, name: uiConfig.advertiserName || 'Report' }];
 }
 
 /**
