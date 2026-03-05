@@ -11,54 +11,56 @@ function onOpen(e) {
     .createAddonMenu()
     .addItem('Open Sidebar', 'showSidebar')
     .addSeparator()
-    .addItem('Run Last Report', 'rerunLastReport')
+    .addItem('Re-run Last Meta Report', 'rerunLastMetaReport')
+    .addItem('Re-run Last TikTok Report', 'rerunLastTikTokReport')
+    .addItem('Re-run Last Snapchat Report', 'rerunLastSnapReport')
+    .addItem('Re-run Last Reddit Report', 'rerunLastRedditReport')
+    .addItem('Re-run Last Pinterest Report', 'rerunLastPinterestReport')
     .addToUi();
 }
 
-/**
- * Runs when the add-on is installed.
- */
-function onInstall(e) {
-  onOpen(e);
-}
+function onInstall(e) { onOpen(e); }
+function onHomepage(e) { showSidebar(); }
 
-/**
- * Add-on homepage trigger (for card-based add-ons).
- */
-function onHomepage(e) {
-  showSidebar();
-}
-
-/**
- * Opens the main sidebar UI.
- */
 function showSidebar() {
   var html = HtmlService.createHtmlOutputFromFile('ui/Sidebar')
     .setTitle('Social Ads Reporter')
-    .setWidth(320);
+    .setWidth(340);
   SpreadsheetApp.getUi().showSidebar(html);
 }
 
-/**
- * Re-runs the last report configuration (stored in user properties).
- */
-function rerunLastReport() {
-  var props = PropertiesService.getUserProperties();
-  var lastConfig = props.getProperty('LAST_REPORT_CONFIG');
+// ── Re-run shortcuts ────────────────────────────────────────────────────────
+
+function rerunLastMetaReport() {
+  rerunReport_('LAST_REPORT_CONFIG', 'Meta', runReport);
+}
+function rerunLastTikTokReport() {
+  rerunReport_('LAST_TIKTOK_REPORT_CONFIG', 'TikTok', runTikTokReport);
+}
+function rerunLastSnapReport() {
+  rerunReport_('LAST_SNAP_REPORT_CONFIG', 'Snapchat', runSnapchatReport);
+}
+function rerunLastRedditReport() {
+  rerunReport_('LAST_REDDIT_REPORT_CONFIG', 'Reddit', runRedditReport);
+}
+function rerunLastPinterestReport() {
+  rerunReport_('LAST_PINTEREST_REPORT_CONFIG', 'Pinterest', runPinterestReport);
+}
+
+function rerunReport_(propKey, platformName, reportFn) {
+  var lastConfig = PropertiesService.getUserProperties().getProperty(propKey);
   if (!lastConfig) {
-    SpreadsheetApp.getUi().alert('No previous report found. Use the sidebar to configure a report.');
+    SpreadsheetApp.getUi().alert('No previous ' + platformName + ' report found. Use the sidebar to configure one.');
     return;
   }
-  var result = JSON.parse(runReport(JSON.parse(lastConfig)));
+  var result = JSON.parse(reportFn(JSON.parse(lastConfig)));
   SpreadsheetApp.getUi().alert(result.message);
 }
 
-/**
- * Called from the sidebar to run a report and store the config for re-runs.
- */
+// ── Sidebar entry points ────────────────────────────────────────────────────
+
 function runReportFromSidebar(uiConfigJson) {
   var uiConfig = JSON.parse(uiConfigJson);
-  // Store for re-run
   PropertiesService.getUserProperties().setProperty('LAST_REPORT_CONFIG', uiConfigJson);
   return runReport(uiConfig);
 }
