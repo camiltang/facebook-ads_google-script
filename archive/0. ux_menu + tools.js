@@ -1,6 +1,6 @@
 function onOpen(e) {
   SpreadsheetApp.getUi()
-    .createMenu('Dyson Report')
+    .createMenu('Ads Report')
     .addItem('Request Report', 'runreports')
     .addItem('Import Report', 'exportMerge')
     .addSeparator()
